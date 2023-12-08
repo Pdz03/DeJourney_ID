@@ -41,9 +41,10 @@
 
       <!-- .navbar -->
 
-      <div id="navbar-container">
-        
-      </div>
+      <i class="mobile-nav-toggle mobile-nav-show bi bi-list"></i>
+      <i class="mobile-nav-toggle mobile-nav-hide d-none bi bi-x"></i>
+      <nav id="navbar" class="navbar">
+      </nav>
 
     </div>
   </header><!-- End Header -->
@@ -55,6 +56,7 @@
       <div class="container">
         <div class="row justify-content-center">
           <div class="col-lg-7 text-center">
+            <p>{{ msg }}</p>
             <h2 data-aos="fade-down" style="font-size: 50px;">Welcome to <span style="color: yellowgreen; font-size: 50px;" >DeJourney ID</span><span>.</span></h2>
             <p data-aos="fade-up">"DeJourney ID - Temukan dan Bagikan Keindahan Tanah Air Bersama Kami!"
               <br><br>Mari bersama-sama menjelajahi keindahan Indonesia, satu destinasi wisata pada satu waktunya! ✈️🗺️🌅</p>
@@ -275,6 +277,16 @@
 
   <div id="preloader"></div>
 
+  <script>
+    {% if request.args.get('msg') %}
+        alert("{{ request.args.get('msg') }}")
+    {% endif %}
+
+    $(document).ready(function () {
+      $('#navhome').addClass('active')
+    })
+  </script>
+
   <!-- Vendor JS Files -->
   <script src="static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="static/vendor/aos/aos.js"></script>
@@ -287,6 +299,8 @@
   <!-- Template Main JS File -->
   <script src="static/js/main.js"></script>
   <script src="static/js/navbar-control.js"></script>
+
+
 
 </body>
 

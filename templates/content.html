@@ -24,6 +24,27 @@
 
   <!-- Template Main CSS File -->
   <link href="static/css/main.css" rel="stylesheet">
+
+  <link href="static/css/style.css" rel="stylesheet" />
+  
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+  <script>
+    $(document).ready(function () {
+      $('#navcontent').addClass('active');
+    })
+  
+    $.ajax({
+      type: "GET",
+      url: "/auth_login",
+      data: {},
+      success: function (response) {
+        if (response["result"] == "fail") {
+          $('#btn-add').addClass('visually-hidden');
+        }
+        }
+      })
+  </script>
 </head>
 
 <body>
@@ -39,13 +60,6 @@
       <i class="mobile-nav-toggle mobile-nav-show bi bi-list"></i>
       <i class="mobile-nav-toggle mobile-nav-hide d-none bi bi-x"></i>
       <nav id="navbar" class="navbar">
-        <ul>
-          <li><a href="/">Home</a></li>
-          <li><a href="/content" class="active">Content</a></li>
-          <li><a href="/media">Media</a></li>
-          <li><a href="/about">About Us</a></li>
-          <li><a href="/login">Login</a></li>
-        </ul>
       </nav><!-- .navbar -->
 
     </div>
@@ -103,17 +117,16 @@
           </div>
         </div>
       
-        <section id="blog" class="blog">
-          <div class="container" data-aos="fade-up" data-aos-delay="100">
+          <div class="container mt-5" data-aos="fade-up" data-aos-delay="100">
         <div class="sidebar-item search-form">
           <form action="" class="mt-3">
             <input type="text" placeholder="Search...">
             <button type="submit"><i class="bi bi-search"></i></button>
-            <button type="button" class="btn btn-primary" style="background-color: #508D69;" data-toggle="modal" data-target="#shareExperienceModal">
-              Bagikan Pengalaman
+            <button type="button" class="btn btn-primary btn-djID" id="btn-add" data-toggle="modal" data-target="#shareExperienceModal">
+              Tambah Cerita Perjalanan
             </button>
           </form>
-        </div><!-- End sidebar search formn-->  
+        </div></div><!-- End sidebar search formn-->  
         
     <!-- ======= Blog Section ======= -->
     <section id="blog" class="blog">
@@ -255,9 +268,13 @@
 
  <!-- Template Main JS File -->
  <script src="static/js/main.js"></script>
+ <script src="static/js/navbar-control.js"></script>
+
  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
 
 </body>
 

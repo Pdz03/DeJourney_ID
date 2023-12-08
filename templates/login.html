@@ -45,9 +45,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
 
     <script>
-      {% if email %}
-          alert("Emailmu {{ email }}")
-      {% endif %}
+      $(document).ready(function () {
+        $("#navlogin").addClass("active");
+      });
     </script>
   </head>
 
@@ -65,15 +65,7 @@
 
           <i class="mobile-nav-toggle mobile-nav-show bi bi-list"></i>
           <i class="mobile-nav-toggle mobile-nav-hide d-none bi bi-x"></i>
-          <nav id="navbar" class="navbar">
-            <ul>
-              <li><a href="/">Home</a></li>
-              <li><a href="/content">Content</a></li>
-              <li><a href="/media">Media</a></li>
-              <li><a href="/about">About Us</a></li>
-              <li><a href="/login" class="active">Login</a></li>
-            </ul>
-          </nav>
+          <nav id="navbar" class="navbar"></nav>
           <!-- .navbar -->
         </div>
       </header>
@@ -179,7 +171,7 @@
                                 </span>
                               </div>
                               <h6
-                                class="text-start mb-2"
+                                class="text-start text-danger mb-2"
                                 id="help-password2"
                               ></h6>
                               <button
@@ -213,15 +205,13 @@
                             </div>
                             <div id="add-logform">
                               <button
-                                class="btn btn-lg btn-block btn-primary mb-2"
-                                style="background-color: #508d69"
+                                class="btn btn-lg btn-block mb-2 btn-djID"
                                 onclick="login()"
                               >
                                 Login
                               </button>
                               <button
-                                class="btn btn-lg btn-block btn-primary mb-2"
-                                style="background-color: #9ade7b"
+                                class="btn btn-lg btn-block mb-2 btn-djID2"
                                 onclick="resetform_login()"
                               >
                                 Reset
@@ -280,5 +270,6 @@
     <!-- Template Main JS File -->
     <script src="static/js/main.js"></script>
     <script src="static/js/form-control.js"></script>
+    <script src="static/js/navbar-control.js"></script>
   </body>
 </html>

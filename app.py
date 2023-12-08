@@ -1,6 +1,8 @@
 from flask import Flask, render_template, jsonify, request, redirect, url_for
 from pymongo import MongoClient
-import bcrypt
+from datetime import datetime, timedelta
+import jwt
+
 
 app = Flask(__name__)
 app.config["TEMPLATES_AUTO_RELOAD"] = True
@@ -21,28 +23,46 @@ def home():
 
 @app.route('/auth_login')
 def auth_login():
-    return render_template('index.html')
-
+    token_receive = request.cookies.get(TOKEN_KEY)
+    try:
+        payload = jwt.decode(
+            token_receive,
+            SECRET_KEY,
+            algorithms=["HS256"],
+        )
+        user_info = db.user.find_one({'email': payload.get('id')})
+        data_user = {
+            'username': user_info['profile_name'],
+            'level': user_info['level']
+        }
+        return jsonify({"result": "success", "data": data_user})
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return jsonify({"result": "fail"})
 
 @app.route('/login')
 def page_login():
-    return render_template('login.html')
+    token_receive = request.cookies.get(TOKEN_KEY)
+    try:
+        payload = jwt.decode(
+            token_receive,
+            SECRET_KEY,
+            algorithms=["HS256"],
+        )
+        user_info = db.user.find_one({'email': payload.get('id')})
+
+        print(user_info)
+
+        return redirect(url_for("home", msg="Anda sudah login!"))
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return render_template('login.html')
+    
 
 
 @app.route('/register/check_dup', methods=["POST"])
 def check_dup():
     username_receive = request.form.get("username_give")
     exists = bool(db.user.find_one({'username': username_receive}))
-    password_receive = "admin@123"
-
-    # converting password to array of bytes
-    bytes = password_receive.encode('utf-8')
-
-    # generating the salt
-    salt = bcrypt.gensalt()
-
-    # Hashing the password
-    hash = bcrypt.hashpw(bytes, salt)
+    # hash = "admin123"
 
     # doc = [
     #     {"username": "admin1",
@@ -80,7 +100,7 @@ def check_dup():
     # db.user.insert_many(doc)
     # listuser = list(db.user.find({},{'_id':False}))
     # print(listuser)
-    
+
     return jsonify({"result": "success", "exists": exists})
 
 
@@ -90,36 +110,69 @@ def register():
     email_receive = request.form.get("email_give")
     password_receive = request.form.get("password_give")
 
-    # converting password to array of bytes
-    bytes = password_receive.encode('utf-8')
-
-    # generating the salt
-    salt = bcrypt.gensalt()
-
-    # Hashing the password
-    password_hash = bcrypt.hashpw(bytes, salt)
-
     data_user = {
         "username": username_receive,
-         "email": email_receive,
-         "password": password_hash,
-         "profile_name": username_receive,
-         "profile_pic": "",
-         "profile_pic_real": "profile_pics/profile_icon.png",
-         "profile_info": "",
-         "blocked": False,
-         "level": 2
+        "email": email_receive,
+        "password": password_receive,
+        "profile_name": username_receive,
+        "profile_pic": "",
+        "profile_pic_real": "profile_pics/profile_icon.png",
+        "profile_info": "",
+        "blocked": False,
+        "level": 2
     }
-
 
     db.user.insert_one(data_user)
 
     return jsonify({"result": "success", "data": email_receive})
 
 
+@app.route('/login', methods=["POST"])
+def login():
+    email_receive = request.form["email_give"]
+    password_receive = request.form["password_give"]
+
+    result = db.user.find_one(
+        {
+            "email": email_receive,
+            "password": password_receive,
+        }
+    )
+
+    data_user = {
+        'username': result['profile_name'],
+        'level': result['level']
+    }
+
+    if result:
+        payload = {
+            "id": email_receive,
+            # the token will be valid for 24 hours
+            "exp": datetime.utcnow() + timedelta(seconds=60 * 60 * 24),
+        }
+        token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
+
+        return jsonify(
+            {
+                "result": "success",
+                "token": token,
+                "data":data_user,
+            }
+        )
+    # Let's also handle the case where the id and
+    # password combination cannot be found
+    else:
+        return jsonify(
+            {
+                "result": "fail",
+                "msg": "Kami tidak dapat menemukan akun anda, silakan cek email dan password anda!",
+            }
+        )
+
+
 @app.route('/content')
 def content():
-    return render_template('content.html')
+    return render_template('content.html', nav_active="content")
 
 
 @app.route('/media')

@@ -29,6 +29,8 @@ togglePassword.addEventListener("click", function () {
     this.classList.toggle("bi-eye");
 });
 
+function showhidePass (){
+
 const togglePassword2 = document.querySelector("#togglePassword2");
 const password2 = document.querySelector("#form-password2");
 
@@ -40,6 +42,9 @@ togglePassword2.addEventListener("click", function () {
     // toggle the icon
     this.classList.toggle("bi-eye");
 });
+}
+
+showhidePass();
 
 function is_password(asValue) {
     var regExp = /^(?=.*\d)(?=.*[a-zA-Z])[0-9a-zA-Z!@#$%^&*]{8,20}$/;
@@ -52,10 +57,91 @@ function is_email(asValue) {
 }
 
 function login(){
-    let email = $('#form-email').val();
-    let password = $('#form-password').val();
+    let inputEmail = $('#form-email');
+    let inputPassword = $('#form-password');
 
-    console.log(email, password)
+    let email = inputEmail.val();
+    let password = inputPassword.val();
+
+    let helpEmail = $('#help-email');
+    let helpPassword = $('#help-password');
+
+    if (email === "") {
+      $('#fg-email')
+      .removeClass('mb-3')
+      .addClass('mb-1')
+      helpEmail
+        .text("Mohon masukkan email!")
+        .removeClass("text-dark")
+        .addClass("text-danger");
+      inputEmail.focus();
+      return;
+    } else if (!is_email(email)) {
+      $('#fg-email')
+      .removeClass('mb-3')
+      .addClass('mb-1')
+      helpEmail
+        .text(
+          "Masukkan email dengan benar (example@example.com)"
+        )
+        .removeClass("text-dark")
+        .addClass("taxt-danger");
+      inputEmail.focus();
+    } else {
+      $('#fg-email')
+      .removeClass('mb-3')
+      .addClass('mb-1')
+      helpEmail
+        .text("Email sesuai!")
+        .removeClass("text-danger")
+        .removeClass("text-dark")
+        .addClass("text-success");
+    }
+
+    if (password === "") {
+      helpPassword
+        .text("Mohon masukkan password!")
+        .removeClass("text-dark")
+        .addClass("text-danger");
+      inputPassword.focus();
+      return;
+    } else if (!is_password(password)) {
+      helpPassword
+        .text(
+          "Masukkan password dengan 8-10 karakter, angka, atau spesial karakter (!@#$%^&*)"
+        )
+        .removeClass("text-success")
+        .removeClass("text-dark")
+        .addClass("taxt-danger");
+      inputPassword.focus();
+    } else {
+      helpPassword
+        .text("Password sesuai!")
+        .removeClass("text-danger")
+        .removeClass("text-dark")
+        .addClass("text-success");
+    }
+
+    $.ajax({
+      type: "POST",
+      url: "/login",
+      data: {
+        email_give: email,
+        password_give: password,
+      },
+      success: function (response) {
+        if (response["result"] == "success") {
+          $.cookie("mytoken", response["token"], { path: "/" });
+
+          alert("Anda berhasil login! Mulailah berbagi pengalaman perjalananmu!" + response.data['username']);
+          window.location.href = "/content";
+        } else {
+          alert(response["msg"]);
+        }
+
+      },
+    });
+
 }
 
 function resetform_login(){
@@ -204,29 +290,31 @@ function register(){
         .text(
           "Masukkan password yang sama dengan sebelumnya!"
         )
+        .removeClass("text-dark")
         .addClass("taxt-danger");
       inputPassword2.focus();
     } else {
         helpPassword2
         .text("Password sesuai!")
         .removeClass("text-danger")
+        .removeClass("text-dark")
         .addClass("text-success");
-    }
 
-    $.ajax({
-      type: "POST",
-      url: "/register",
-      data: {
-        username_give: username,
-        email_give: email,
-        password_give: password,
-      },
-      success: function (response) {
-        console.log(response.data);
-        alert("Akun anda telah terdaftar!");
-        window.location.replace("/login?email="+response.data);
-      },
-    });
+        $.ajax({
+          type: "POST",
+          url: "/register",
+          data: {
+            username_give: username,
+            email_give: email,
+            password_give: password,
+          },
+          success: function (response) {
+            console.log(response.data);
+            alert("Akun anda telah terdaftar!");
+            window.location.replace("/login?email="+response.data);
+          },
+        });
+    }
 }
 
 function resetform_register(){
