@@ -26,11 +26,39 @@
 
     <!-- Template Main CSS File -->
     <link href="static/css/main.css" rel="stylesheet">
-
     <script>
-        document.getElementById('logout-button').onclick = function () {
-            window.location.href = 'login.html';
-        };
+        function sign_out() {
+            $.removeCookie('mytoken', { path: '/' });
+            alert('Signed out!');
+            window.location.href = "/login";
+        }
+
+        function update_profile() {
+            let name = $("#input-name").val();
+            let file = $("#input-pic")[0].files[0];
+            let about = $("#textarea-about").val();
+            let form_data = new FormData();
+            form_data.append("file_give", file);
+            form_data.append("name_give", name);
+            form_data.append("about_give", about);
+            console.log(name, file, about, form_data);
+
+            $.ajax({
+                type: "POST",
+                url: "/update_profile",
+                data: form_data,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function (response) {
+                    if (response["result"] === "success") {
+                        alert(response["msg"]);
+                        window.location.reload();
+                    }
+                },
+            });
+        }
+
     </script>
 </head>
 
@@ -46,14 +74,27 @@
 
             <i class="mobile-nav-toggle mobile-nav-show bi bi-list"></i>
             <i class="mobile-nav-toggle mobile-nav-hide d-none bi bi-x"></i>
-            <nav id="navbar" class="navbar">
-                <ul>
-                    <li><a href="/">Home</a></li>
-                    <li><a href="/content">Content</a></li>
-                    <li><a href="/media">Media</a></li>
-                    <li><a href="/about" class="active">About Us</a></li>
-                    <li><a href="/login">Login</a></li>
-            </nav>
+
+            <!-- Updated Navbar Structure -->
+            <div id="navbar" class="navbar">
+                <div class="row">
+                    <div class="col"><a href="/">Home</a></div>
+                    <div class="col"><a href="/content">Content</a></div>
+                    <div class="col"><a href="/media">Media</a></div>
+                    <div class="col"><a href="/about" class="active">About Us</a></div>
+                    <div class="col nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="bi bi-person-circle"></i>
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="#" onclick="update_profile()">Profil Pengguna</a>
+                            <a class="dropdown-item" href="#" onclick="showNotifications()">Notifikasi</a>
+                            <div class="dropdown-divider"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <!-- .navbar -->
 
         </div>
