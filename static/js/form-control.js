@@ -133,7 +133,7 @@ function login(){
         if (response["result"] == "success") {
           $.cookie("mytoken", response["token"], { path: "/" });
 
-          alert("Anda berhasil login! Mulailah berbagi pengalaman perjalananmu!" + response.data['username']);
+          alert("Anda berhasil login! Mulailah berbagi pengalaman perjalananmu!" + response.data['profilename']);
           window.location.href = "/content";
         } else {
           alert(response["msg"]);
