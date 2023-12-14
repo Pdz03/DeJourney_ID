@@ -54,3 +54,4 @@ function sign_out() {
   alert("Signed out!");
   window.location.href = "/login";
 }
+

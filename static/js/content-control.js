@@ -134,11 +134,12 @@ function get_posts(){
                 let post = postlist[i];
                 let time_post = new Date(post["date"]);
                 let time_before = time2str(time_post);
+                console.log(time_before);
                 let temp_post = `
                 <div class="col-xl-4 col-md-6">
                 <div class="post-item position-relative h-100">
                   <div class="post-img position-relative overflow-hidden">
-                    <img src="static/${post['image']}" class="img-fluid" alt="${post['judul']}">
+                    <img src="static/${post['image']}" class="img-fluid list-img" alt="${post['judul']}">
                     <span class="post-date">${time_before}</span>
                   </div>
                   <div class="post-content d-flex flex-column">
@@ -168,36 +169,155 @@ function get_posts(){
 }
 
 function time2str(date) {
-    let today = new Date();
-   let time = (today - date) / 1000 / 60;  // minutes
+  let today = new Date();
+  let time = (today - date) / 1000 / 60; // minutes
+  let timeH = time / 60;
+  let timeD = timeH / 24;
 
-   if (time < 5) {
-      return "Just now";
-   }
-   if (time < 60) { 
-       return parseInt(time) + " minutes ago";
-    }
-    time = time / 60;  // hours
-    return parseInt(time) + " hours ago";
-
-   if (time < 24) {
-   return parseInt(time) + " hours ago";
+  if (time < 5) {
+    return "Just now";
   }
-  time = time / 24; // days
-  return parseInt(time) + " days ago";
+  if (time < 60) {
+    return parseInt(time) + " minutes ago";
+  } else if (timeH < 2) {
+    return "1 hour ago";
+  } else if (timeH < 24) {
+    return parseInt(timeH) + " hours ago";
+  } else if (timeD > 2) { 
+    return "1 day ago";
+  } else if (timeD < 7) {
+    return parseInt(timeD) + " days ago";
+  }
+  return `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()}`;
+}
 
-  if (time < 7) {
-  return parseInt(time) + " days ago";
-    }
-return `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()}`;
+function num2str(count) {
+  if (count > 10000) {
+      return parseInt(count / 1000) + "k"
+  }
+  if (count > 500) {
+      return parseInt(count / 100) / 10 + "k"
+  }
+  return count
+}
+
+function toggle_like(post_id, type) {
+  console.log(post_id, type);
+  let $a_like = $(`a[aria-label='heart']`);
+  let $i_like = $a_like.find("i");
+  if ($i_like.hasClass("bi-heart-fill")) {
+    $.ajax({
+      type: "POST",
+      url: "/update_like",
+      data: {
+        post_id_give: post_id,
+        type_give: type,
+        action_give: "unlike",
+      },
+      success: function (response) {
+        console.log("unlike");
+        $i_like.addClass("bi-heart").removeClass("bi-heart-fill");
+        console.log(num2str(response["count"]))
+        $("span.like-num").text(num2str(response["count"]))
+      },
+    });
+  } else {
+    $.ajax({
+      type: "POST",
+      url: "/update_like",
+      data: {
+        post_id_give: post_id,
+        type_give: type,
+        action_give: "like",
+      },
+      success: function (response) {
+        console.log("like");
+        $i_like.addClass("bi-heart-fill").removeClass("bi-heart");
+        $("span.like-num").text(response["count"]);
+      },
+    });
+  }
+}
+
+function add_comment(post_id){
+  let inputKomen = $('#comment-input');
+
+  let komen = inputKomen.val();
+
+  if (komen === "") {
+    alert("Mohon isikan komentar!")
+    inputKomen.focus();
+    return;
+  } else {
+  let today = new Date().toISOString();
+  $.ajax({
+    type: "POST",
+    url: "/add_comment",
+    data: {
+      post_id_give: post_id,
+      comment_give: komen,
+      date_give: today,
+    },
+    success: function (response) {
+      if (response["result"] === "success") {
+        alert(response["msg"]);
+        window.location.reload();
+      }
+    },
+  });
+  }
+}
+
+function edit_comment(comment_id){
+  let inputKomenEdit = $('#comment-edit');
+
+  let komenEdit = inputKomenEdit.val();
+
+  if (komenEdit === "") {
+    alert("Mohon isikan komentar terbaru!")
+    inputKomenEdit.focus();
+    return;
+  } else {
+  $.ajax({
+    type: "POST",
+    url: "/update_comment",
+    data: {
+      comment_id_give: comment_id,
+      comment_give: komenEdit,
+    },
+    success: function (response) {
+      if (response["result"] === "success") {
+        alert(response["msg"]);
+        window.location.reload();
+      }
+    },
+  });
+  }
+}
+
+function delete_comment(commentid){
+  if (confirm("Yakin ingin menghapus komentar ini?") == true) {
+    $.ajax({
+      type: "POST",
+      url: "/deletecomment/"+commentid,
+      data: {},
+      cache: false,
+      contentType: false,
+      processData: false,
+      success: function (response) {
+      if (response["result"] === "success") {
+        alert(response["msg"]);
+        window.location.reload();
+      }
+    },
+  });
+  }
 }
 
 function search_post(){
-    console.log("Aaaa");
     let searchPost = document
     .getElementById('search')
     .value.toLowerCase();
-
     
   let titleList = document.querySelectorAll('.post-title');
   console.log(titleList);
@@ -223,10 +343,10 @@ function auth_login_content(){
     })
 }
 
-function auth_login_detail(){
+function auth_login_detail(postcreator){
   $.ajax({
     type: "GET",
-    url: "/auth_login",
+    url: "/auth_login/"+postcreator,
     data: {},
     success: function (response) {
       if (response["result"] == "fail") {
@@ -235,3 +355,4 @@ function auth_login_detail(){
       }
     })
 }
+

@@ -42,6 +42,40 @@ def auth_login():
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return jsonify({"result": "fail"})
 
+@app.route('/auth_login/<postcreator>')
+def auth_login_detail(postcreator):
+    token_receive = request.cookies.get(TOKEN_KEY)
+    try:
+        payload = jwt.decode(
+            token_receive,
+            SECRET_KEY,
+            algorithms=["HS256"],
+        )
+        user_info = db.user.find_one({'username': payload.get('id')})
+        if user_info['username'] == postcreator:
+            return jsonify({"result": "success"})
+        else:
+            return jsonify({"result": "fail"})
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return jsonify({"result": "fail"})
+
+@app.route('/auth_login/<commentcreator>')
+def auth_login_comment(commentcreator):
+    token_receive = request.cookies.get(TOKEN_KEY)
+    try:
+        payload = jwt.decode(
+            token_receive,
+            SECRET_KEY,
+            algorithms=["HS256"],
+        )
+        user_info = db.user.find_one({'username': payload.get('id')})
+        if user_info['username'] == commentcreator:
+            return jsonify({"result": "success"})
+        else:
+            return jsonify({"result": "fail"})
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return jsonify({"result": "fail"})
+
 @app.route('/login')
 def page_login():
     token_receive = request.cookies.get(TOKEN_KEY)
@@ -169,6 +203,108 @@ def posting():
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("home"))
 
+@app.route("/update_like", methods=["POST"])
+def update_like():
+    token_receive = request.cookies.get("mytoken")
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=["HS256"])
+        # We should change the like count for the post here
+        user_info = db.user.find_one({"username": payload["id"]})
+        post_id_receive = request.form["post_id_give"]
+        type_receive = request.form["type_give"]
+        action_receive = request.form["action_give"]
+        doc = {
+            "postid": post_id_receive,
+            "username": user_info["username"],
+            "type": type_receive,
+        }
+
+        print(action_receive)
+
+        if action_receive == "like":
+            db.likes.insert_one(doc)
+        else:
+            db.likes.delete_one(doc)
+        count = db.likes.count_documents(
+            {"postid": post_id_receive, "type": type_receive}
+        )
+
+        return jsonify({"result": "success", "msg": "updated", "count": count})
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("home"))
+    
+@app.route("/add_comment", methods=["POST"])
+def add_comment():
+    token_receive = request.cookies.get("mytoken")
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=["HS256"])
+        # We should change the like count for the post here
+        user_info = db.user.find_one({"username": payload["id"]})
+        post_id_receive = request.form["post_id_give"]
+        comment_receive = request.form["comment_give"]
+        time = datetime.now().strftime("%m%d%H%M%S")
+        date_receive = request.form["date_give"]
+        doc = {
+            "commentid": f'commentid-{time}',
+            "postid": post_id_receive,
+            "username": user_info["username"],
+            "comment": comment_receive,
+            "date": date_receive
+        }
+
+        db.comments.insert_one(doc)
+        count = db.comments.count_documents(
+            {"postid": post_id_receive}
+        )
+
+        return jsonify({"result": "success", "msg": "Komentar terkirim!", "count": count})
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("home"))
+    
+@app.route("/update_comment", methods=["POST"])
+def update_comment():
+    token_receive = request.cookies.get("mytoken")
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=["HS256"])
+        comment_id_receive = request.form["comment_id_give"]
+        comment_receive = request.form["comment_give"]
+
+        db.comments.update_one({"commentid": comment_id_receive}, {"$set": {"comment": comment_receive}})
+        return jsonify({"result": "success", "msg": "Komentar sukses diupdate!"})
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("home"))
+
+@app.route('/deletecomment/<idcomment>', methods=['POST'])
+def deletecomment(idcomment):
+    db.comments.delete_one({"commentid":idcomment})
+    return jsonify({"result": "success", "msg": "Komentar berhasil dihapus!"})
+
+@app.route("/update_reply/<commentid>", methods=["POST"])
+def update_reply(commentid):
+    token_receive = request.cookies.get("mytoken")
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=["HS256"])
+        # We should change the like count for the post here
+        user_info = db.user.find_one({"username": payload["id"]})
+        commentid_receive = request.form["commentid_give"]
+        reply_receive = request.form["reply_give"]
+        date_receive = request.form["date_give"]
+        doc = {
+            "commentid": commentid_receive,
+            "username": user_info["username"],
+            "reply": reply_receive,
+            "date":date_receive,
+        }
+
+        db.comments.insert_one(doc)
+        count = db.comments.count_documents(
+            {"postid": post_id_receive}
+        )
+
+        return jsonify({"result": "success", "msg": "updated", "count": count})
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("home"))
+
 @app.route("/update_story", methods=["POST"])
 def update_post():
     token_receive = request.cookies.get("mytoken")
@@ -215,27 +351,139 @@ def get_posts():
 
 @app.route('/detail_content/<idpost>')
 def detail_content(idpost):
-    try:
-        post_info = db.posts.find_one(
-                {"postid": idpost},
-                {"_id": False}
-            )
-        locale.setlocale(locale.LC_ALL, 'id_ID.UTF8')
+    token_receive = request.cookies.get("mytoken")
+    post_info = db.posts.find_one(
+            {"postid": idpost},
+            {"_id": False}
+        )
+    print(post_info)
+    if post_info == None:
+        print('ora ono')
+    if post_info != None:
+        post_info["count_heart"] = db.likes.count_documents(
+                {"postid": idpost, "type": "heart"})
+        post_info['count_comment'] = db.comments.count_documents({"postid": idpost})
 
-        date_string = post_info['date']
-        date_object = datetime.strptime(date_string, "%Y-%m-%dT%H:%M:%S.%fZ")
+        date_string_post = post_info['date']
+        date_object = datetime.strptime(date_string_post, "%Y-%m-%dT%H:%M:%S.%fZ")
         date = date_object.date()
         formatted_date = date.strftime("%d %B %Y")
 
-        return render_template("detail-content.html", post_info=post_info, datepost=formatted_date)
-    except:
-        return redirect(url_for("content",  errmsg="Postingan ini tidak ada atau sudah dihapus!"))
+        user = db.user.find_one({"username": post_info['username']})
 
+    komen_info = list(db.comments.find({"postid": idpost}).sort("date", -1))
+    for komen in komen_info:
+        komen["_id"] = str(komen["_id"])
+        komen['user'] = db.user.find_one({"username": komen['username']})
+        date_string_komen = komen['date']
+        date_object_komen = datetime.strptime(date_string_komen, "%Y-%m-%dT%H:%M:%S.%fZ")
+        now = datetime.now()
+        difference = now - date_object_komen
+        seconds_difference = difference.total_seconds()
+        minutes_difference = (seconds_difference / 60)
+        hours_difference = (seconds_difference / 3600)
+        days_difference = (hours_difference / 24)
+
+        if minutes_difference < 1:
+            formatted_difference = "Just now"
+        elif minutes_difference < 2:
+            formatted_difference = "1 minute ago"
+        elif minutes_difference < 60:
+            formatted_difference = f"{int(minutes_difference)} minutes ago"
+        elif hours_difference < 2:
+            formatted_difference = "1 hour ago"
+        elif hours_difference < 24:
+            formatted_difference = f"{int(hours_difference)} hours ago"
+        elif days_difference < 2:
+            formatted_difference = "1 day ago"
+        elif days_difference < 7:
+            formatted_difference = f"{int(days_difference)}1 day ago"
+        else:
+            formatted_difference = date_object_komen.date().strftime("%d %B %Y")
+        komen['timecom'] = formatted_difference
+        
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=["HS256"])
+        post_info["heart_by_me"] = bool(db.likes.find_one(
+                {"postid": idpost, "type": "heart", "username": payload['id']}))
+        
+        user_info = db.user.find_one({"username": payload["id"]})
+
+        return render_template(
+            "detail-content.html", 
+            post_info=post_info, 
+            datepost=formatted_date, 
+            user=user, 
+            user_info= user_info,
+            komen_info=komen_info)
+    except(jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        if post_info != None:
+            print('ora ono')
+            return render_template(
+                "detail-content.html", 
+                post_info=post_info, 
+                datepost=formatted_date, 
+                user=user, 
+                komen_info=komen_info
+                )
+        elif post_info == None:
+            return redirect(url_for("content",  errmsg="Postingan ini tidak ada atau sudah dihapus!"))
+    
+@app.route('/user/<username>')
+def user(username):
+    user_info = db.user.find_one(
+        {"username": username},
+        {"_id": False}
+    )
+    token_receive = request.cookies.get("mytoken")
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=["HS256"])
+        user_login = db.user.find_one({"username": payload["id"]})
+        print(user_login)
+        if user_info['username'] == user_login['username']:
+            return render_template("user-profile.html", user_info=user_info, user_login=user_login)
+        else:
+            return render_template("user-profile.html", user_info=user_info)
+    except(jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return render_template("user-profile.html", user_info=user_info)
+
+@app.route("/update_profile", methods=["POST"])
+def update_profile():
+    token_receive = request.cookies.get("mytoken")
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=["HS256"])
+        username = payload["id"]
+        fullname_receive = request.form["fullname_give"]
+        email_receive = request.form["email_give"]
+        job_receive = request.form["job_give"]
+        phone_receive = request.form["phone_give"]
+        address_receive = request.form["address_give"]
+        bio_receive = request.form["bio_give"]
+        new_doc = {
+            "profile_name": fullname_receive,
+            "email": email_receive,
+            "profile_job": job_receive,
+            "profile_phone": phone_receive,
+            "profile_address": address_receive,
+            "profile_info":bio_receive
+            }
+        if "file_give" in request.files:
+            time = datetime.now().strftime("%m%d%H%M%S")
+            file = request.files["file_give"]
+            filename = secure_filename(file.filename)
+            extension = filename.split(".")[-1]
+            file_path = f"profile_pics/profilimg-{username}-{time}.{extension}"
+            file.save("./static/" + file_path)
+            new_doc["profile_pic"] = filename
+            new_doc["profile_pic_real"] = file_path
+        db.user.update_one({"username": payload["id"]}, {"$set": new_doc})
+        return jsonify({"result": "success", "msg": "Profile updated!"})
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("home"))
 
 @app.route('/content')
 def content():
     return render_template('content.html')
-
 
 @app.route('/media')
 def media():

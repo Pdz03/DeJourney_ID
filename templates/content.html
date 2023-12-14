@@ -65,7 +65,13 @@
     <div class="container-fluid container-xl d-flex align-items-center justify-content-between">
 
       <a href="/" class="logo d-flex align-items-center">
-        <h1 style="color: greenyellow;">DeJourney ID</h1><span style="color: aliceblue;">.</span>
+        <img
+          src="{{ url_for('static', filename='DJ_icon.png') }}"
+          alt="icon-DejourneyID"
+          height="40px"
+        />
+        <h1 style="color: greenyellow">DeJourney ID</h1>
+        <span style="color: aliceblue">.</span>
       </a>
 
       <i class="mobile-nav-toggle mobile-nav-show bi bi-list"></i>
@@ -140,15 +146,7 @@
 
         <div class="row gy-4 posts-list" id="list">
         </div><!-- End blog posts list -->
-
-        <div class="blog-pagination">
-          <ul class="justify-content-center">
-            <li><a href="#">1</a></li>
-            <li class="active"><a href="#">2</a></li>
-            <li><a href="#">3</a></li>
-          </ul>
-        </div><!-- End blog pagination -->
-
+        
       </div>
     </section><!-- End Blog Section -->
 

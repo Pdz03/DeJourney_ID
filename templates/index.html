@@ -24,9 +24,24 @@
 
   <!-- Template Main CSS File -->
   <link href="static/css/main.css" rel="stylesheet">
+  <link href="static/css/style.css" rel="stylesheet">
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+
+  <script>
+    {% if request.args.get('msg') %}
+        alert("{{ request.args.get('msg') }}")
+    {% endif %}
+
+    $(document).ready(function () {
+      $('#navhome').addClass('active')
+
+      get_posts();
+    })
+
+    
+  </script>
 </head>
 
 <body>
@@ -36,7 +51,13 @@
     <div class="container-fluid container-xl d-flex align-items-center justify-content-between">
 
       <a href="/" class="logo d-flex align-items-center">
-        <h1 style="color: rgb(40, 46, 32);">DeJourney ID</h1><span style="color: aliceblue;">.</span>
+        <img
+          src="{{ url_for('static', filename='DJ_icon.png') }}"
+          alt="icon-DejourneyID"
+          height="40px"
+        />
+        <h1 style="color: greenyellow">DeJourney ID</h1>
+        <span style="color: aliceblue">.</span>
       </a>
 
       <!-- .navbar -->
@@ -98,108 +119,11 @@
     <section id="blog" class="blog" style="margin-top: -100px;">
       <div class="container" data-aos="fade-up" data-aos-delay="100">
 
-        <div class="row gy-4 posts-list">
-          <div class="col-xl-4 col-md-6">
-            <div class="post-item position-relative h-100">
-
-              <div class="post-img position-relative overflow-hidden">
-                <img src="static/img/blog/bajo.jpg" class="img-fluid" alt="">
-                <span class="post-date">December 12</span>
-              </div>
-
-              <div class="post-content d-flex flex-column">
-
-                <h3 class="post-title">Dolorum optio tempore voluptas dignissimos cumque fuga qui quibusdam quia</h3>
-
-                <div class="meta d-flex align-items-center">
-                  <div class="d-flex align-items-center">
-                    <i class="bi bi-person"></i> <span class="ps-2">John Doe</span>
-                  </div>
-                </div>
-
-                <p>
-                  Similique neque nam consequuntur ad non maxime aliquam quas. Quibusdam animi praesentium. Aliquam et laboriosam eius aut nostrum quidem aliquid dicta.
-                </p>
-
-                <hr>
-
-                <a href="/detail_content" class="readmore stretched-link"><span>Read More</span><i class="bi bi-arrow-right"></i></a>
-
-              </div>
-
-            </div>
-          </div><!-- End post list item -->
-
-          <div class="col-xl-4 col-md-6">
-            <div class="post-item position-relative h-100">
-
-              <div class="post-img position-relative overflow-hidden">
-                <img src="static/img/blog/sultra.jpeg" class="img-fluid" alt="">
-                <span class="post-date">March 19</span>
-              </div>
-
-              <div class="post-content d-flex flex-column">
-
-                <h3 class="post-title">Nisi magni odit consequatur autem nulla dolorem</h3>
-
-                <div class="meta d-flex align-items-center">
-                  <div class="d-flex align-items-center">
-                    <i class="bi bi-person"></i> <span class="ps-2">Julia Parker</span>
-                  </div>
-                </div>
-
-                <p>
-                  Incidunt voluptate sit temporibus aperiam. Quia vitae aut sint ullam quis illum voluptatum et. Quo libero rerum voluptatem pariatur nam.
-                </p>
-
-                <hr>
-
-                <a href="blog-details.html" class="readmore stretched-link"><span>Read More</span><i class="bi bi-arrow-right"></i></a>
-
-              </div>
-
-            </div>
-          </div><!-- End post list item -->
-
-          <div class="col-xl-4 col-md-6">
-            <div class="post-item position-relative h-100">
-
-              <div class="post-img position-relative overflow-hidden">
-                <img src="static/img/blog/lohliang.jpg" class="img-fluid" alt="">
-                <span class="post-date">June 24</span>
-              </div>
-
-              <div class="post-content d-flex flex-column">
-
-                <h3 class="post-title">Possimus soluta ut id suscipit ea ut. In quo quia et soluta libero sit sint.</h3>
-
-                <div class="meta d-flex align-items-center">
-                  <div class="d-flex align-items-center">
-                    <i class="bi bi-person"></i> <span class="ps-2">Maria Doe</span>
-                  </div>
-                </div>
-
-                <p>
-                  Aut iste neque ut illum qui perspiciatis similique recusandae non. Fugit autem dolorem labore omnis et. Eum temporibus fugiat voluptate enim tenetur sunt omnis.
-                </p>
-
-                <hr>
-
-                <a href="blog-details.html" class="readmore stretched-link"><span>Read More</span><i class="bi bi-arrow-right"></i></a>
-
-              </div>
-
-            </div>
+        <div class="row gy-4 posts-list" id="listhome">
           </div><!-- End post list item -->      
-      
-              <div class="blog-pagination">
-                <ul class="justify-content-center">
-                  <li><a href="#">1</a></li>
-                  <li class="active"><a href="#">2</a></li>
-                  <li><a href="#">3</a></li>
-                </ul>
-              </div><!-- End blog pagination -->
-      
+        <div class="text-center mt-5">
+          <a href="/content" class="btn btn-primary btn-djID">Lihat Cerita Perjalanan Lain</a><!-- End blog pagination -->
+      </div>
             </div>
           </section><!-- End Blog Section -->
           
@@ -277,16 +201,6 @@
 
   <div id="preloader"></div>
 
-  <script>
-    {% if request.args.get('msg') %}
-        alert("{{ request.args.get('msg') }}")
-    {% endif %}
-
-    $(document).ready(function () {
-      $('#navhome').addClass('active')
-    })
-  </script>
-
   <!-- Vendor JS Files -->
   <script src="static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="static/vendor/aos/aos.js"></script>
@@ -294,11 +208,11 @@
   <script src="static/vendor/isotope-layout/isotope.pkgd.min.js"></script>
   <script src="static/vendor/swiper/swiper-bundle.min.js"></script>
   <script src="static/vendor/purecounter/purecounter_vanilla.js"></script>
-  <script src="static/vendor/php-email-form/validate.js"></script>
 
   <!-- Template Main JS File -->
   <script src="static/js/main.js"></script>
   <script src="static/js/navbar-control.js"></script>
+  <script src="static/js/home-control.js"></script>
 
 
 
