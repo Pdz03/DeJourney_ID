@@ -38,9 +38,65 @@
 
     <!-- Template Main CSS File -->
     <link href="static/css/main.css" rel="stylesheet" />
+    <link href="static/css/style.css" rel="stylesheet" />
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+
+    <script>
+      function showAddForm() {
+        if ($("select").val() === "add") {
+          console.log("tambah");
+          $("#ig-kategori").addClass("visually-hidden");
+          $("#morekat").removeClass("visually-hidden");
+        }
+      }
+
+      function addmedia() {
+        let kategori = "";
+        let type = "";
+        if ($("select").val() === "add") {
+          kategori = $("#morekat").val();
+          type = "baru";
+        } else {
+          kategori = $("select").val();
+          type = "lama";
+        }
+        let title = $("#title").val();
+        let deskripsi = $("#description").val();
+        let file = $("#image")[0].files[0];
+
+        if (title === "") {
+          alert("Masukkan judul gambar");
+        } else if (kategori === "") {
+          alert("Masukkan kategori atau tambahkan kategori lain");
+        } else if (deskripsi === "") {
+          alert("Tambahkan deskripsi gambar!");
+        } else {
+          let form_data = new FormData();
+          form_data.append("file_give", file);
+          form_data.append("title_give", title);
+          form_data.append("kategori_give", kategori);
+          form_data.append("type_give", type);
+          form_data.append("deskripsi_give", deskripsi);
+
+          $.ajax({
+            type: "POST",
+            url: "/add_media",
+            data: form_data,
+            cache: false,
+            contentType: false,
+            processData: false,
+            success: function (response) {
+              if (response["result"] === "success") {
+                alert("Media berhasil diupload!");
+                window.location.reload();
+              }
+            },
+          });
+        }
+      }
+    </script>
   </head>
 
   <body>
@@ -101,60 +157,112 @@
               <h5 class="modal-title" id="addImageModalLabel">Tambah Gambar</h5>
               <button
                 type="button"
-                class="close"
-                data-dismiss="modal"
+                class="btn-close"
+                data-bs-dismiss="modal"
                 aria-label="Close"
-              >
-                <span aria-hidden="true">&times;</span>
-              </button>
+              ></button>
             </div>
             <div class="modal-body">
-              <form
-                action="upload_image.php"
-                method="post"
-                enctype="multipart/form-data"
+              <div class="form-group mb-3">
+                <label for="description">Masukan gambar:</label><br />
+                <input
+                  type="file"
+                  class="form-control"
+                  id="image"
+                  name="image"
+                  required
+                />
+              </div>
+              <div class="form-group mb-3">
+                <label for="description">Judul Gambar</label><br />
+                <input
+                  type="text"
+                  class="form-control"
+                  id="title"
+                  placeholder="Masukkan judul"
+                />
+              </div>
+              <div class="form-group mb-3">
+                <label for="description">Kategori:</label><br />
+                <div class="input-group" id="ig-kategori">
+                  <label class="input-group-text" for="inputGroupSelect01"
+                    >Options</label
+                  >
+                  <select
+                    name="kategori"
+                    class="form-select"
+                    id="kategori"
+                    onchange="showAddForm()"
+                  >
+                    <option selected value="">Choose...</option>
+                    {% for list in kategori %}
+                    <option value="{{list.kategori}}">{{list.kategori}}</option>
+                    {% endfor %}
+                    <option value="add">Tambah kategori lain ...</option>
+                  </select>
+                </div>
+                <input
+                  type="text"
+                  class="form-control visually-hidden morekat"
+                  id="morekat"
+                  placeholder="Masukkan kategori lain"
+                />
+              </div>
+              <div class="form-group mb-3">
+                <label for="description">Deskripsi:</label>
+                <textarea
+                  class="form-control"
+                  id="description"
+                  name="description"
+                  rows="4"
+                  placeholder="Masukkan deskripsi gambar"
+                  required
+                ></textarea>
+              </div>
+              <button onclick="addmedia()" class="btn btn-primary">
+                Simpan
+              </button>
+              <button
+                type="submit"
+                class="btn btn-danger"
+                data-bs-dismiss="modal"
+                aria-label="Close"
               >
-                <div class="form-group">
-                  <label for="description">Masukan gambar:</label><br />
-                  <input
-                    type="file"
-                    class="form-control"
-                    id="image"
-                    name="image"
-                    required
-                  />
-                </div>
-                <div class="form-group">
-                  <br />
-                  <label for="description">Deskripsi:</label>
-                  <br /><textarea
-                    class="form-control"
-                    id="description"
-                    name="description"
-                    rows="4"
-                    required
-                  ></textarea>
-                </div>
-                <button type="submit" class="btn btn-primary">Simpan</button>
-              </form>
+                Batal
+              </button>
             </div>
           </div>
         </div>
       </div>
 
       <section id="projects" class="projects">
+        {% if user_login %} {% else %}
+        <div class="text-center">
+          <h5 class="text-danger">
+            Login untuk menambahkan gambar cerita perjalanan anda
+          </h5>
+          <button
+            class="btn btn-primary btn-djID"
+            onclick="window.location.href='/login'"
+          >
+            Login Di Sini
+          </button>
+        </div>
+        {% endif %}
         <div class="container">
           <div class="row" style="margin-left: 82%">
             <div class="col-md-12 text-right mt-3">
+              {% if user_login %}
               <button
                 type="button"
                 class="btn btn-primary"
                 style="background-color: #508d69"
-                data-toggle="modal"
-                data-target="#addImageModal"
+                data-bs-toggle="modal"
+                data-bs-target="#addImageModal"
               >
                 Tambah Gambar
               </button>
+              {% endif %}
             </div>
           </div>
         </div>
@@ -173,10 +281,12 @@
               data-aos="fade-up"
               data-aos-delay="100"
             >
-              <li data-filter="*" class="filter-active">All</li>
-              <li data-filter=".filter-remodeling">View</li>
-              <li data-filter=".filter-construction">Trip</li>
-              <li data-filter=".filter-repairs">Random</li>
+              <li data-filter="*" class="filter-active">Semua</li>
+              {% if kategori %} {% for datakat in kategori %}
+              <li data-filter=".filter-{{datakat.kategori}}">
+                {{datakat.kategori}}
+              </li>
+              {% endfor %} {% endif %}
             </ul>
             <!-- End Projects Filters -->
 
@@ -185,70 +295,38 @@
               data-aos="fade-up"
               data-aos-delay="200"
             >
-              <div class="col-lg-4 col-md-6 portfolio-item filter-remodeling">
+              {% if media %} {% for datamedia in media %}
+              <div
+                class="col-lg-4 col-md-6 portfolio-item filter-{{datamedia.kategori}}"
+              >
                 <div class="portfolio-content h-100">
                   <img
-                    src="static/img/media/toba.jpg"
+                    src="static/{{datamedia.image}}"
                     class="img-fluid"
-                    alt=""
+                    alt="{{datamedia.title}}"
                   />
                   <div class="portfolio-info">
-                    <h4>Remodeling 1</h4>
-                    <p>Lorem ipsum, dolor sit amet consectetur</p>
+                    <h5>
+                      <a
+                        href="/user/{{datamedia.username}}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        >Posted By {{datamedia.username}}</a
+                      >
+                    </h5>
+                    <h4>{{datamedia.kategori}}</h4>
+                    <p>{{datamedia.title}}</p>
                     <a
-                      href="static/img/media/toba.jpg"
-                      title="Remodeling 1"
-                      data-gallery="portfolio-gallery-remodeling"
+                      href="static/{{datamedia.image}}"
+                      title="{{datamedia.deskripsi}}"
+                      data-gallery="portfolio-gallery-{{datamedia.kategori}}"
                       class="glightbox preview-link"
                       ><i class="bi bi-zoom-in"></i
                     ></a>
                   </div>
                 </div>
               </div>
-              <!-- End Projects Item -->
-
-              <div class="col-lg-4 col-md-6 portfolio-item filter-construction">
-                <div class="portfolio-content h-100">
-                  <img
-                    src="static/img/media/pulau.jpg"
-                    class="img-fluid"
-                    alt=""
-                  />
-                  <div class="portfolio-info">
-                    <h4>Construction 1</h4>
-                    <p>Lorem ipsum, dolor sit amet consectetur</p>
-                    <a
-                      href="static/img/media/pulau.jpg"
-                      title="Construction 1"
-                      data-gallery="portfolio-gallery-construction"
-                      class="glightbox preview-link"
-                      ><i class="bi bi-zoom-in"></i
-                    ></a>
-                  </div>
-                </div>
-              </div>
-              <!-- End Projects Item -->
-
-              <div class="col-lg-4 col-md-6 portfolio-item filter-repairs">
-                <div class="portfolio-content h-100">
-                  <img
-                    src="static/img/media/prambanan.jpg"
-                    class="img-fluid"
-                    alt=""
-                  />
-                  <div class="portfolio-info">
-                    <h4>Repairs 1</h4>
-                    <p>Lorem ipsum, dolor sit amet consectetur</p>
-                    <a
-                      href="static/img/media/prambanan.jpg"
-                      title="Repairs 1"
-                      data-gallery="portfolio-gallery-repairs"
-                      class="glightbox preview-link"
-                      ><i class="bi bi-zoom-in"></i
-                    ></a>
-                  </div>
-                </div>
-              </div>
+              {% endfor %} {% endif %}
               <!-- End Projects Item -->
             </div>
             <!-- End Projects Container -->
@@ -286,7 +364,6 @@
     <script src="static/vendor/isotope-layout/isotope.pkgd.min.js"></script>
     <script src="static/vendor/swiper/swiper-bundle.min.js"></script>
     <script src="static/vendor/purecounter/purecounter_vanilla.js"></script>
-    <script src="static/vendor/php-email-form/validate.js"></script>
 
     <!-- Template Main JS File -->
     <script src="static/js/main.js"></script>
@@ -297,9 +374,5 @@
         $("#navmedia").addClass("active");
       });
     </script>
-
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
   </body>
 </html>

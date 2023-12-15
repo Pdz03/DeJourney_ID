@@ -17,10 +17,10 @@
     />
 
     <!-- Vendor CSS Files -->
-    <!-- <link
+    <link
       href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}"
       rel="stylesheet"
-    /> -->
+    />
     <link
       href="{{ url_for('static', filename='vendor/bootstrap-icons/bootstrap-icons.css') }}"
       rel="stylesheet"
@@ -259,7 +259,10 @@
                         alt="..."
                         style="width: 32px"
                       />
-                      &nbsp;<a href="/user/{{post_info.username}}"
+                      &nbsp;<a
+                        href="/user/{{post_info.username}}"
+                        target="_blank"
+                        rel="noopener noreferrer"
                         >{{post_info.username}}</a
                       >
                       <div class="ms-3" id="btn-post-control">
@@ -404,7 +407,10 @@
                         height="40"
                       />
                       <div class="form-outline">
-                        <a href="/user/{{komen.username}}"
+                        <a
+                          href="/user/{{komen.username}}"
+                          target="_blank"
+                          rel="noopener noreferrer"
                           ><strong>{{komen.username}}</strong></a
                         >
                         <p class="text-justify">{{komen.comment}}</p>

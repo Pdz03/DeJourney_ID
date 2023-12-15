@@ -136,52 +136,58 @@
           <h2>DeJourney Moments</h2>
           <p>"Lensa Perjalananmu Mengabadikan Indahnya Indonesia"</p>
         </div>
+          <div
+            class="portfolio-isotope"
+            data-portfolio-filter="*"
+            data-portfolio-layout="masonry"
+            data-portfolio-sort="original-order"
+           >
+            <ul
+              class="portfolio-flters"
+              data-aos="fade-up"
+              data-aos-delay="100"
+            >
+              <li data-filter="*" class="filter-active">Semua</li>
+              {% if kategori %} {% for datakat in kategori %}
+              <li data-filter=".filter-{{datakat.kategori}}">
+                {{datakat.kategori}}
+              </li>
+              {% endfor %} {% endif %}
+            </ul>
+            <!-- End Projects Filters -->
 
-        <div class="portfolio-isotope" data-portfolio-filter="*" data-portfolio-layout="masonry" data-portfolio-sort="original-order">
-
-          <ul class="portfolio-flters" data-aos="fade-up" data-aos-delay="100">
-            <li data-filter="*" class="filter-active">All</li>
-            <li data-filter=".filter-remodeling">View</li>
-            <li data-filter=".filter-construction">trip</li>
-            <li data-filter=".filter-repairs">Random</li>
-          </ul><!-- End Projects Filters -->
-
-          <div class="row gy-4 portfolio-container" data-aos="fade-up" data-aos-delay="200">
-
-            <div class="col-lg-4 col-md-6 portfolio-item filter-remodeling">
-              <div class="portfolio-content h-100">
-                <img src="static/img/media/toba.jpg" class="img-fluid" alt="">
-                <div class="portfolio-info">
-                  <h4>Remodeling 1</h4>
-                  <p>Lorem ipsum, dolor sit amet consectetur</p>
-                  <a href="static/img/media/toba.jpg" title="Remodeling 1" data-gallery="portfolio-gallery-remodeling" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
+            <div
+              class="row gy-4 portfolio-container"
+              data-aos="fade-up"
+              data-aos-delay="200"
+            >
+              {% if media %} {% for datamedia in media %}
+              <div
+                class="col-lg-4 col-md-6 portfolio-item filter-{{datamedia.kategori}}"
+              >
+                <div class="portfolio-content h-100">
+                  <img
+                    src="static/{{datamedia.image}}"
+                    class="img-fluid"
+                    alt="{{datamedia.title}}"
+                  />
+                  <div class="portfolio-info">
+                    <h4>{{datamedia.kategori}}</h4>
+                    <p>{{datamedia.title}}</p>
+                    <a
+                      href="static/{{datamedia.image}}"
+                      title="{{datamedia.deskripsi}}"
+                      data-gallery="portfolio-gallery-{{datamedia.kategori}}"
+                      class="glightbox preview-link"
+                      ><i class="bi bi-zoom-in"></i
+                    ></a>
+                  </div>
                 </div>
               </div>
-            </div><!-- End Projects Item -->
-
-            <div class="col-lg-4 col-md-6 portfolio-item filter-construction">
-              <div class="portfolio-content h-100">
-                <img src="static/img/media/pulau.jpg" class="img-fluid" alt="">
-                <div class="portfolio-info">
-                  <h4>Construction 1</h4>
-                  <p>Lorem ipsum, dolor sit amet consectetur</p>
-                  <a href="static/img/media/pulau.jpg" title="Construction 1" data-gallery="portfolio-gallery-construction" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
-                </div>
+              {% endfor %} {% endif %}
+              <!-- End Projects Item -->
               </div>
-            </div><!-- End Projects Item -->
-
-            <div class="col-lg-4 col-md-6 portfolio-item filter-repairs">
-              <div class="portfolio-content h-100">
-                <img src="static/img/media/prambanan.jpg" class="img-fluid" alt="">
-                <div class="portfolio-info">
-                  <h4>Repairs 1</h4>
-                  <p>Lorem ipsum, dolor sit amet consectetur</p>
-                  <a href="static/img/media/prambanan.jpg" title="Repairs 1" data-gallery="portfolio-gallery-repairs" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
-                </div>
-              </div>
-            </div><!-- End Projects Item -->
-
-  
+            </div>
 
   </main><!-- End #main -->
 
@@ -202,7 +208,7 @@
   <div id="preloader"></div>
 
   <!-- Vendor JS Files -->
-  <script src="static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+ 
   <script src="static/vendor/aos/aos.js"></script>
   <script src="static/vendor/glightbox/js/glightbox.min.js"></script>
   <script src="static/vendor/isotope-layout/isotope.pkgd.min.js"></script>

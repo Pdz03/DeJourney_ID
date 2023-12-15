@@ -135,6 +135,7 @@ function get_posts(){
                 let time_post = new Date(post["date"]);
                 let time_before = time2str(time_post);
                 console.log(time_before);
+                if(post['confirm']===1){
                 let temp_post = `
                 <div class="col-xl-4 col-md-6">
                 <div class="post-item position-relative h-100">
@@ -162,6 +163,7 @@ function get_posts(){
               </div>
                 `
                 $('#list').append(temp_post);
+                }
                 }
             }
           }

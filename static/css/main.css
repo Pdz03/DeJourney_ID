@@ -8,6 +8,7 @@
 :root {
   --color-default: #364d59;
   --color-primary: #22d84c;
+  --color-primary2: #ffffff;
   --color-secondary: #52565e;
 }
 
@@ -795,6 +796,9 @@ section {
 }
 
 .projects .portfolio-content img {
+  height:200px;
+  width:100%;
+  object-fit: cover;
   transition: 0.3s;
 }
 
@@ -815,6 +819,15 @@ section {
   color: #fff;
   display: inline-block;
   background-color: var(--color-primary);
+}
+
+.projects .portfolio-content .portfolio-info h5 {
+  font-size: 14px;
+  padding: 5px 10px;
+  font-weight: 400;
+  color: #fff;
+  display: inline-block;
+  background-color: var(--color-primary2);
 }
 
 .projects .portfolio-content .portfolio-info p {

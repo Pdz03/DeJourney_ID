@@ -7,11 +7,14 @@ function get_posts(){
             console.log(response['posts']);
             if (response["result"] == "success") {
                 let postlist = response['posts'];
-                for(let i=0; i<3; i++){
-                let post = postlist[i];
+                for(let i=0; i<postlist.length; i++){
+                  let post = postlist[i];
+                  if(post['confirm']===1){
+                
                 let time_post = new Date(post["date"]);
                 let time_before = time2str(time_post);
                 console.log(time_before);
+                
                 let temp_post = `
                 <div class="col-xl-4 col-md-6">
                 <div class="post-item position-relative h-100">
@@ -39,6 +42,7 @@ function get_posts(){
               </div>
                 `
                 $('#listhome').append(temp_post);
+                }
                 }
             }
           }
