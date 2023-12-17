@@ -5,14 +5,23 @@
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>DeJourney ID</title>
+  <title>Profile User - {{user_info.profile_name}}</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
+
+  <meta property="og:title" content="DeJourney ID" />
+  <meta property="og:description" content="Bagikan pengalaman wisatamu" />
+  <meta
+    property="og:image"
+    content="{{ url_for('static', filename='og_image.png') }}"
+  />
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600;1,700&family=Roboto:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Work+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+
+  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
 
   <!-- Vendor CSS Files -->
   <link
@@ -56,6 +65,7 @@
   
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 </head>
 
@@ -66,7 +76,13 @@
     <div class="container-fluid container-xl d-flex align-items-center justify-content-between">
 
       <a href="/" class="logo d-flex align-items-center">
-        <h1 style="color: greenyellow;">DeJourney ID</h1><span style="color: aliceblue;">.</span>
+        <img
+          src="{{ url_for('static', filename='DJ_icon.png') }}"
+          alt="icon-DejourneyID"
+          height="40px"
+        />
+        <h1 style="color: greenyellow">DeJourney ID</h1>
+        <span style="color: aliceblue">.</span>
       </a>
 
       <i class="mobile-nav-toggle mobile-nav-show bi bi-list"></i>
@@ -86,8 +102,85 @@
       </div>
     </div><!-- End Breadcrumbs -->
 
-        <!-- ======= Get Started Section ======= -->
-        {% if user_login %}
+    {% if user_login %}
+    <div
+    class="modal fade"
+    id="modalResetPass"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="shareExperienceModal"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="blockModalLabel">Reset Password</h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <label for="old">Password Lama:</label>
+          <div class="input-group mb-3" id="fg-password2">
+            
+            <input
+              type="password"
+              class="form-control"
+              placeholder="Masukkan Password Lama"
+              aria-label="password-old"
+              aria-describedby="button-addon2"
+              id="old-password"
+            />
+            <span
+              class="input-group-text"
+              id="basic-addon3"
+            >
+              <i
+                class="bi bi-eye-slash"
+                id="togglePasswordOld"
+              >
+              </i>
+            </span>
+          </div>
+          <label for="old">Password Baru:</label>
+          <div class="input-group mb-3" id="fg-password2">
+            
+            <input
+              type="password"
+              class="form-control"
+              placeholder="Masukkan Password Baru"
+              aria-label="password-new"
+              aria-describedby="button-addon2"
+              id="new-password"
+            />
+            <span
+              class="input-group-text"
+              id="basic-addon3"
+            >
+              <i
+                class="bi bi-eye-slash"
+                id="togglePasswordNew"
+              >
+              </i>
+            </span>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Cancel
+          </button>
+          <button type="button" class="btn btn-primary" onclick="resetPass('{{user_login.username}}', '{{user_login.password}}')">Update</button>
+        </div>
+      </div>
+    </div>
+  </div>
         <div class="modal fade" id="shareExperienceModal" tabindex="-1" role="dialog" aria-labelledby="shareExperienceModalLabel" aria-hidden="true">
           <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -162,7 +255,6 @@
           </div>
         </div>
         {% endif %}
-      
         
     <!-- ======= Blog Section ======= -->
       <div class="container" data-aos="fade-up" data-aos-delay="100">
@@ -185,7 +277,7 @@
                       {% if user_login %}
                       <div class="d-flex justify-content-center mb-2">
                         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#shareExperienceModal">Edit Profil</button>
-                        <button type="button" class="btn btn-outline-primary ms-1">Logout</button>
+                        <button type="button" class="btn btn-outline-primary ms-1" onclick="sign_out()">Logout</button>
                       </div>
                       {% endif %}
                     </div>
@@ -250,7 +342,7 @@
                         </div>
                         <div class="col-sm-9">
                           <div class="col-sm-9">
-                            <button type="button" class="btn btn-danger">Update Password</button>
+                            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modalResetPass">Update Password</button>
                           </div>
                         </div>
                       </div>

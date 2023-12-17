@@ -135,7 +135,6 @@ function get_posts(){
                 let time_post = new Date(post["date"]);
                 let time_before = time2str(time_post);
                 console.log(time_before);
-                if(post['confirm']===1){
                 let temp_post = `
                 <div class="col-xl-4 col-md-6">
                 <div class="post-item position-relative h-100">
@@ -163,7 +162,7 @@ function get_posts(){
               </div>
                 `
                 $('#list').append(temp_post);
-                }
+                
                 }
             }
           }
@@ -185,7 +184,7 @@ function time2str(date) {
     return "1 hour ago";
   } else if (timeH < 24) {
     return parseInt(timeH) + " hours ago";
-  } else if (timeD > 2) { 
+  } else if (timeD < 2) { 
     return "1 day ago";
   } else if (timeD < 7) {
     return parseInt(timeD) + " days ago";
@@ -205,6 +204,7 @@ function num2str(count) {
 
 function toggle_like(post_id, type) {
   console.log(post_id, type);
+  let today = new Date().toISOString()
   let $a_like = $(`a[aria-label='heart']`);
   let $i_like = $a_like.find("i");
   if ($i_like.hasClass("bi-heart-fill")) {
@@ -214,6 +214,7 @@ function toggle_like(post_id, type) {
       data: {
         post_id_give: post_id,
         type_give: type,
+        date_give: today,
         action_give: "unlike",
       },
       success: function (response) {
@@ -230,6 +231,7 @@ function toggle_like(post_id, type) {
       data: {
         post_id_give: post_id,
         type_give: type,
+        date_give: today,
         action_give: "like",
       },
       success: function (response) {

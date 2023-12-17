@@ -20,6 +20,10 @@ function login_auth (){
 
         }else if(response.data.level == "2"){
         console.log(response.data);
+        let unread = '';
+        if (response.notif > 0){
+          unread = `&nbsp;<i class="bi bi-circle-fill text-danger"></i>`
+        }
         let temp_navbar = `
         <ul>
           <li><a href="/" id="navhome">Home</a></li>
@@ -27,7 +31,7 @@ function login_auth (){
           <li><a href="/media" id="navmedia">Media</a></li>
           <li><a href="/about" id="navabout">About Us</a></li>
           <li><a href="/user/${response.data.username}" id="navmedia">Profil</a></li>
-          <li><a href="/about" id="navabout">Notifikasi</a></li>
+          <li><a href="/notifikasi" id="navnotif">Notifikasi${unread}</a></li>
           <li><a class="" onclick="sign_out()" style="cursor: pointer" id="navlogout">
 Logout&nbsp;&nbsp;<img
 class="rounded-circle shadow-1-strong me-3"
@@ -61,8 +65,25 @@ $('#navbar').append(temp_navbar);
 login_auth();
 
 function sign_out() {
-  $.removeCookie("mytoken", { path: "/" });
-  alert("Signed out!");
-  window.location.href = "/login";
+  Swal.fire({
+    title: "Are you sure?",
+    text: "Anda akan logout dari akun anda",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#3085d6",
+    cancelButtonColor: "#d33",
+    confirmButtonText: "Ya, logout!"
+  }).then((result) => {
+    if (result.isConfirmed) {
+      $.removeCookie("mytoken", { path: "/" });
+      Swal.fire({
+          title: "Ter-logout!",
+          text: "Anda sudah logout dari akun anda!",
+          icon: "warning"
+      });
+      window.location.href = "/login";
+    }
+  });
+
 }
 

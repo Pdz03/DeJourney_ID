@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
 
-    <title>DeJourney ID - Dashboard</title>
+    <title>DeJourney ID - Notifikasi</title>
     <meta content="" name="description" />
     <meta content="" name="keywords" />
 
@@ -73,19 +73,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <link
-      rel="stylesheet"
-      href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.css"
-    />
-
-    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.js"></script>
-
     <script>
       $(document).ready(function () {
-        $("#navdashboard").addClass("active");
-        get_postlist();
-        get_user();
-        get_pesan();
+        $("#navnotif").addClass("active");
+        getnotif();
       });
     </script>
   </head>
@@ -117,7 +108,7 @@
     <main id="main">
       <!-- ======= Breadcrumbs ======= -->
       <div
-        class="breadcrumbs d-flex align-items-center"
+        class="breadcrumbs2 d-flex align-items-center"
         style="background-image: url('{{ url_for('static', filename='img/content-bg.jpg') }}');"
       >
         <div
@@ -131,96 +122,20 @@
 
       <!-- ======= Blog Section ======= -->
       <div class="container" data-aos="fade-up" data-aos-delay="100">
-        <section>
-          <h2>DASHBOARD ADMIN</h2>
-          <hr />
-          <div>
-            <button
-              class="btn btn-dark active"
-              id="btn-post"
-              onclick="openpost()"
-            >
-              Kelola Postingan
-            </button>
-            <button class="btn btn-dark" id="btn-user" onclick="openuser()">
-              Kelola User
-            </button>
-            <button class="btn btn-dark" id="btn-pesan" onclick="openpesan()">
-              Kelola Pesan
-            </button>
+        <div class="title-notif">
+          <div class="text-center">
+            <h2>NOTIFIKASI</h2>
           </div>
           <hr />
-          <div id="kelolapost">
-            <h3>Data Postingan</h3>
-            <div class="input-group">
-              <label class="input-group-text" for="inputGroupSelect01"
-                >Kategori Postingan</label
-              >
-              <select
-                name="kategori"
-                class="form-select"
-                id="kategori"
-                onchange="showPost()"
-              >
-                <option selected value="unconfirm">Belum Dikonfirmasi</option>
-                <option value="acc">Postingan Diterima</option>
-                <option value="dec">Postingan Ditolak</option>
-              </select>
-            </div>
-
-            <div id="blog" class="blog mt-3">
-              <div class="container" id="unconfirm">
-                <p id="countunc"></p>
-                <div class="row gy-4 posts-list" id="listunconfirm"></div>
-              </div>
-              <div class="container visually-hidden" id="accpost">
-                <p id="countacc"></p>
-                <div class="row gy-4 posts-list" id="listacc"></div>
-              </div>
-              <div class="container visually-hidden" id="decpost">
-                <p id="countdec"></p>
-                <div class="row gy-4 posts-list" id="listdec"></div>
+          <section class="section-50">
+            <div class="container">
+              <div class="notification-ui_dd-content">
+                <p>Notifikasi belum dibaca ({{unread}})</p>
+                <div id="listnotif"></div>
               </div>
             </div>
-          </div>
-          <div id="kelolauser" class="visually-hidden">
-            <h3>Data User</h3>
-            <table
-              id="tableuser"
-              class="table table-striped"
-              style="width: 100%"
-            >
-              <thead>
-                <tr>
-                  <th>Full Name</th>
-                  <th>Status</th>
-                  <th>Jumlah Postingan</th>
-                  <th>Aksi</th>
-                </tr>
-              </thead>
-              <tbody id="userlist"></tbody>
-            </table>
-          </div>
-          <div id="kelolapesan" class="visually-hidden">
-            <h3>Data Pesan</h3>
-            <table
-              id="tablepesan"
-              class="table table-striped"
-              style="width: 100%"
-            >
-              <thead>
-                <tr>
-                  <th>User</th>
-                  <th>Pesan</th>
-                  <th>Status</th>
-                  <th>Aksi</th>
-                </tr>
-              </thead>
-              <tbody id="pesanlist"></tbody>
-            </table>
-          </div>
-          <div id="modal-on"></div>
-        </section>
+          </section>
+        </div>
       </div>
       <!-- End Blog Section -->
     </main>
@@ -264,6 +179,6 @@
 
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script src="{{ url_for('static', filename='js/navbar-control.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/dashboard-control.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/notifikasi-control.js') }}"></script>
   </body>
 </html>

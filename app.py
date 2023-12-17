@@ -1,5 +1,6 @@
 from flask import Flask, render_template, jsonify, request, redirect, url_for
 from pymongo import MongoClient
+from bson.objectid import ObjectId
 from datetime import datetime, timedelta
 import locale
 import jwt
@@ -36,14 +37,15 @@ def auth_login():
             algorithms=["HS256"],
         )
         user_info = db.user.find_one({'username': payload.get('id')})
-        print(user_info)
+        count_unread = db.notif.count_documents(
+            {'to':payload['id'], 'read': False})
         data_user = {
             'username': user_info['username'],
             'profilename': user_info['profile_name'],
             'level': user_info['level'],
             'profile_icon': user_info['profile_pic_real']
         }
-        return jsonify({"result": "success", "data": data_user})
+        return jsonify({"result": "success", "data": data_user, "notif":count_unread})
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return jsonify({"result": "fail"})
 
@@ -149,6 +151,11 @@ def login():
         'level': result['level']
     }
 
+    if result['blocked'] == True:
+        data_block = db.blocklist.find_one({'user':result['username']})
+        data_user['reasonblock'] = data_block['reason']
+        data_user['userblock'] = data_block['user']
+
     if result:
         payload = {
             "id": result['username'],
@@ -222,6 +229,9 @@ def update_like():
         post_id_receive = request.form["post_id_give"]
         type_receive = request.form["type_give"]
         action_receive = request.form["action_give"]
+        datapost = db.posts.find_one({'postid': post_id_receive})
+        judulpost = datapost['judul']
+        date_receive = request.form["date_give"]
         doc = {
             "postid": post_id_receive,
             "username": user_info["username"],
@@ -232,8 +242,19 @@ def update_like():
 
         if action_receive == "like":
             db.likes.insert_one(doc)
+            doc_notif = {
+            'from': payload["id"],
+            'to':datapost['username'],
+            'type':'like',
+            'toid': post_id_receive,
+            'date': date_receive,
+            'read': False,
+            'isi': f'{payload["id"]} telah menyukai postinganmu yang berjudul "{judulpost}"'
+            }
+            db.notif.insert_one(doc_notif)
         else:
             db.likes.delete_one(doc)
+            db.notif.delete_one({'from':payload["id"], 'toid':post_id_receive})
         count = db.likes.count_documents(
             {"postid": post_id_receive, "type": type_receive}
         )
@@ -254,6 +275,8 @@ def add_comment():
         comment_receive = request.form["comment_give"]
         time = datetime.now().strftime("%m%d%H%M%S")
         date_receive = request.form["date_give"]
+        datapost = db.posts.find_one({'postid': post_id_receive})
+        judulpost = datapost['judul']
         doc = {
             "commentid": f'commentid-{time}',
             "postid": post_id_receive,
@@ -266,6 +289,17 @@ def add_comment():
         count = db.comments.count_documents(
             {"postid": post_id_receive}
         )
+
+        doc_notif = {
+            'from': payload["id"],
+            'to':datapost['username'],
+            'type':'comment',
+            'toid': post_id_receive,
+            'date': date_receive,
+            'read': False,
+            'isi': f'{payload["id"]} telah mengomentari postinganmu yang berjudul "{judulpost}"'
+        }
+        db.notif.insert_one(doc_notif)
 
         return jsonify({"result": "success", "msg": "Komentar terkirim!", "count": count})
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
@@ -359,11 +393,24 @@ def delete(idpost):
 
 @app.route("/list_post")
 def get_posts():
-    posts = list(db.posts.find({}).sort("date", -1).limit(20))
+    posts = list(db.posts.find({'confirm': 1}).sort("date", -1).limit(20))
     for post in posts:
         post["_id"] = str(post["_id"])
 
     return jsonify({"result": "success", "msg": "Successful fetched all posts", "posts": posts})
+
+@app.route("/list_postadmin")
+def get_postadmin():
+    posts = list(db.posts.find({}).sort("date", -1).limit(20))
+    for post in posts:
+        post["_id"] = str(post["_id"])
+    count = {
+        'unc' : db.posts.count_documents({"confirm": 0}),
+        'acc' : db.posts.count_documents({"confirm": 1}),
+        'dec' : db.posts.count_documents({"confirm": 2}),
+    }
+
+    return jsonify({"result": "success", "msg": "Successful fetched all posts", "posts": posts, "count":count})
 
 
 @app.route('/detail_content/<idpost>')
@@ -397,9 +444,9 @@ def detail_content(idpost):
             date_string_komen, "%Y-%m-%dT%H:%M:%S.%fZ")
         now = datetime.now()
         difference = now - date_object_komen
-        seconds_difference = difference.total_seconds()
+        seconds_difference = difference.total_seconds()- 25200
         minutes_difference = (seconds_difference / 60)
-        hours_difference = (seconds_difference / 3600)
+        hours_difference = (seconds_difference / 3600) 
         days_difference = (hours_difference / 24)
 
         if minutes_difference < 1:
@@ -415,7 +462,7 @@ def detail_content(idpost):
         elif days_difference < 2:
             formatted_difference = "1 day ago"
         elif days_difference < 7:
-            formatted_difference = f"{int(days_difference)}1 day ago"
+            formatted_difference = f"{int(days_difference)} days ago"
         else:
             formatted_difference = date_object_komen.date().strftime("%d %B %Y")
         komen['timecom'] = formatted_difference
@@ -500,10 +547,32 @@ def update_profile():
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("home"))
 
+@app.route("/reset_pass", methods=["POST"])
+def reset_pass():
+    token_receive = request.cookies.get("mytoken")
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=["HS256"])
+        username_receive = request.form["username_give"]
+        if username_receive == payload['id']:
+            password_receive = request.form["passnew_give"]
+            db.user.update_one({"username": payload["id"]}, {"$set": {'password':password_receive}})
+
+        return jsonify({"result": "success", "msg": "Profile updated!"})
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("home"))
 
 @app.route('/dashboard')
 def dashboard():
-    return render_template('dashboard.html')
+    token_receive = request.cookies.get("mytoken")
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=["HS256"])
+        user_login = db.user.find_one({"username": payload["id"]})
+        if(user_login['level'] == 1):
+            return render_template('dashboard.html')
+        else:
+            return redirect(url_for("home", msg="Anda tidak diizinkan masuk halaman dashboard!"))
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("home", msg="Anda belum login!"))
 
 
 @app.route('/confirm_post', methods=["POST"])
@@ -514,29 +583,101 @@ def confirm_post():
         username = payload["id"]
         id_receive = request.form["id_give"]
         type_receive = request.form["type_give"]
+        date_receive = request.form["date_give"]
+
+        datapost = db.posts.find_one({'postid': id_receive})
+        judulpost = datapost['judul']
+
+        doc = {
+            'from': username,
+            'to':datapost['username'],
+            'type':'post',
+            'toid': id_receive,
+            'date': date_receive,
+            'read': False,
+        }
+        
+        if int(type_receive) == 1:
+            doc['isi'] = f'{username} telah menerima permintaan postinganmu yang berjudul "{judulpost}"'
+        elif int(type_receive) == 2:
+            reason_receive = request.form["reason_give"]
+            doc['isi'] = f'{username} telah menolak permintaan postinganmu yang berjudul "{judulpost}", dengan alasan "{reason_receive}"'
+
+        print(doc)
+
+        db.notif.insert_one(doc)
+
         db.posts.update_one({"postid": id_receive}, {
                             "$set": {'confirm': int(type_receive)}})
         return jsonify({"result": "success", "msg": "Post updated!"})
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("dashboard"))
 
+@app.route('/confirm_msg', methods=["POST"])
+def confirm_msg():
+    token_receive = request.cookies.get("mytoken")
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=["HS256"])
+        username = payload["id"]
+        id_receive = request.form["id_give"]
+        type_receive = request.form["type_give"]
+        data = db.saran.find_one({'_id': ObjectId(id_receive)})
+        print(data)
+        if type_receive == 'show':
+            db.saran.update_one({"_id": ObjectId(id_receive)}, {
+                            "$set": {'show': True}})
+        elif type_receive == 'delete':
+            db.saran.delete_one({'_id': ObjectId(id_receive)})
+        return jsonify({"result": "success", "msg": "Post updated!"})
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("dashboard"))
+
+@app.route('/blockuser', methods=['POST'])
+def blockuser():
+    token_receive = request.cookies.get("mytoken")
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=["HS256"])
+        username = payload["id"]
+        username_receive = request.form["username_give"]
+        reason_receive = request.form["reason_give"]
+        date_receive = request.form["date_give"]
+
+        doc = {
+            'from': username,
+            'user': username_receive,
+            'reason': reason_receive,
+            'date': date_receive,
+        }
+
+        db.blocklist.insert_one(doc)
+        db.user.update_one({"username": username_receive}, {"$set": {'blocked':True}})
+
+        print(doc)
+        return jsonify({"result": "success", "msg": "User blocked!"})
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("home"))
+
+@app.route('/unblockuser', methods=['POST'])
+def unblockuser():
+    token_receive = request.cookies.get("mytoken")
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=["HS256"])
+        username = payload["id"]
+        username_receive = request.form["username_give"]
+
+        db.blocklist.delete_one({
+            'user': username_receive,
+        })
+
+        db.user.update_one({"username": username_receive}, {"$set": {'blocked':False}})
+
+        return jsonify({"result": "success", "msg": "User unblocked!"})
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("home"))
 
 @app.route('/content')
 def content():
     return render_template('content.html')
-
-@app.route('/cate', methods=['POST'])
-def cate():
-    doc = [
-        {'kategori':'Pantai'},
-        {'kategori':'Gunung'},
-        {'kategori':'Taman'},
-        {'kategori':'Danau'}
-    ]
-
-    print(doc)
-    db.categories.insert_many(doc)
-    return jsonify({"result": "success", "msg": "Post updated!"})
 
 
 @app.route('/media')
@@ -602,7 +743,9 @@ def about():
 def post_saran():
     username_receive = request.form['username_give']
     message_receive = request.form['message_give']
+    time = datetime.now().strftime("%m%d%H%M%S")
     doc= {
+        'msgid': f'msgid-{username_receive}-{time}',
         'username': username_receive,
         'message': message_receive,
         'show': False
@@ -610,11 +753,95 @@ def post_saran():
     db.saran.insert_one(doc)
     return jsonify({"result": "success", "msg": "Saran terkirim!"})
 
+@app.route('/get_user')
+def get_user():
+    datauser = list(db.user.find({'level':2}))
+    for data in datauser:
+        data["_id"] = str(data["_id"])
+        data['count_post'] = db.posts.count_documents(
+            {"username": data['username']})
+    return jsonify({"result": "success", "msg":"berhasil", "data": datauser})
 
-@app.route('/contact')
-def contact():
-    return render_template('contact.html')
+@app.route('/get_pesan')
+def get_pesan():
+    datapesan = list(db.saran.find({}))
+    for data in datapesan:
+        data["_id"] = str(data["_id"])
 
+    return jsonify({"result": "success", "msg":"berhasil", "data": datapesan})
+
+@app.route('/getnotif')
+def getnotif():
+    token_receive = request.cookies.get("mytoken")
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=["HS256"])
+        notif = list(db.notif.find({'to':payload['id']}).sort("read", 1).sort("date", -1))
+
+        for data in notif:
+            data["_id"] = str(data["_id"])
+            date_string_komen = data['date']
+            date_object_komen = datetime.strptime(
+                date_string_komen, "%Y-%m-%dT%H:%M:%S.%fZ")
+            now = datetime.now()
+            difference = now - date_object_komen
+            seconds_difference = difference.total_seconds() - 25200
+            minutes_difference = (seconds_difference / 60)
+            hours_difference = (seconds_difference / 3600)
+            days_difference = (hours_difference / 24)
+
+            if minutes_difference < 1:
+                formatted_difference = "Just now"
+            elif minutes_difference < 2:
+                formatted_difference = "1 minute ago"
+            elif minutes_difference < 60:
+                formatted_difference = f"{int(minutes_difference)} minutes ago"
+            elif hours_difference < 2:
+                formatted_difference = "1 hour ago"
+            elif hours_difference < 24:
+                formatted_difference = f"{int(hours_difference)} hours ago"
+            elif days_difference < 2:
+                formatted_difference = "1 day ago"
+            elif days_difference < 7:
+                formatted_difference = f"{int(days_difference)}1 day ago"
+            else:
+                formatted_difference = date_object_komen.date().strftime("%d %B %Y")
+            data['timenotif'] = formatted_difference
+            datauser = db.user.find_one({'username':data['from']})
+            data['user_from']={
+                'username':datauser['username'],
+                'profile_pic_real':datauser['profile_pic_real']
+            }
+        
+        print(notif)
+        
+        return jsonify({"result": "success", "msg":"berhasil", "notif": notif})
+    except(jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return jsonify({"result": "fail", "msg":"gagal"})
+
+@app.route('/notifikasi')
+def notifikasi():
+    token_receive = request.cookies.get("mytoken")
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=["HS256"])
+        count_unread = db.notif.count_documents(
+            {'to':payload['id'], 'read': False})
+    # posts = list(db.posts.find({}))
+    # for post in posts:
+    #     post["_id"] = str(post["_id"])
+    #     db.posts.update_one({"postid": post['postid']}, {"$set": {'confirm': 0}})
+    
+    # db.notif.delete_many({},{})
+        return render_template('notifikasi.html', unread=count_unread)
+    except(jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("home"))
+    
+
+@app.route('/read_notif', methods=['POST'])
+def read_notif():
+    id_receive = request.form['id_give']
+    db.notif.update_one({"_id": ObjectId(id_receive)}, {
+                            "$set": {'read': True}})
+    return jsonify({"result": "success", "msg":"berhasil"})
 
 @app.route('/detail_content')
 def detail_content_sample():

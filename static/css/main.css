@@ -48,6 +48,11 @@ h6 {
 /*--------------------------------------------------------------
 # Sections & Section Header
 --------------------------------------------------------------*/
+.title-notif {
+  padding: 40px 0;
+  overflow: hidden;
+}
+
 section {
   padding: 80px 0;
   overflow: hidden;
@@ -147,6 +152,60 @@ section {
 }
 
 .breadcrumbs ol li+li::before {
+  display: inline-block;
+  padding-right: 10px;
+  color: #fff;
+  content: "/";
+}
+
+.breadcrumbs2 {
+  padding: 50px 0 30px 0;
+  min-height: 20vh;
+  position: relative;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.breadcrumbs2:before {
+  content: "";
+  background-color: rgba(0, 0, 0, 0.6);
+  position: absolute;
+  inset: 0;
+}
+
+.breadcrumbs2 h2 {
+  font-size: 56px;
+  font-weight: 500;
+  color: #fff;
+  font-family: var(--font-secondary);
+}
+
+.breadcrumbs2 ol {
+  display: flex;
+  flex-wrap: wrap;
+  list-style: none;
+  padding: 0 0 10px 0;
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.breadcrumbs2 ol a {
+  color: rgba(255, 255, 255, 0.8);
+  transition: 0.3s;
+}
+
+.breadcrumbs2 ol a:hover {
+  text-decoration: underline;
+}
+
+.breadcrumbs2 ol li+li {
+  padding-left: 10px;
+}
+
+.breadcrumbs2 ol li+li::before {
   display: inline-block;
   padding-right: 10px;
   color: #fff;

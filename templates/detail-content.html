@@ -4,9 +4,16 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
 
-    <title>DeJourney ID</title>
+    <title>{{post_info.judul}} - DeJourney ID</title>
     <meta content="" name="description" />
     <meta content="" name="keywords" />
+
+    <meta property="og:title" content="DeJourney ID" />
+    <meta property="og:description" content="Bagikan pengalaman wisatamu" />
+    <meta
+      property="og:image"
+      content="{{ url_for('static', filename='og_image.png') }}"
+    />
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -14,6 +21,12 @@
     <link
       href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600;1,700&family=Roboto:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Work+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap"
       rel="stylesheet"
+    />
+
+    <link
+      rel="shortcut icon"
+      href="{{ url_for('static', filename='favicon.ico') }}"
+      type="image/x-icon"
     />
 
     <!-- Vendor CSS Files -->
@@ -62,6 +75,7 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script src="https://cdn.ckeditor.com/ckeditor5/40.1.0/classic/ckeditor.js"></script>
 
@@ -217,6 +231,7 @@
               </div>
               <br /><br />
               <div class="text-center">
+                {% if post_info.confirm == 1 %}
                 <button
                   type="button"
                   onclick="update()"
@@ -224,6 +239,15 @@
                 >
                   Update
                 </button>
+                {% elif post_info.confirm == 2 %}
+                <button
+                  type="button"
+                  onclick="resend()"
+                  class="btn btn-primary"
+                >
+                  Kirim Ulang
+                </button>
+                {% endif %}
                 <button
                   type="button"
                   data-bs-dismiss="modal"
@@ -242,14 +266,18 @@
           <div class="row g-0">
             <div class="col-sm-6 col-md-8">
               <article class="blog-details">
-                <div class="post-img">
+                <div class="post-img detail-img">
                   <img
                     src="{{ url_for('static', filename=post_info.image) }}"
                     alt=""
                     class="img-fluid"
                   />
                 </div>
-                <h2 class="title">{{post_info.judul}}</h2>
+                <h2 class="title">
+                  {{post_info.judul}}{% if post_info.confirm == 2 %}
+                  <p class="text-danger">(Ditolak)</p>
+                  {% endif %}
+                </h2>
                 <div class="meta-top">
                   <ul>
                     <li class="d-flex align-items-center">
@@ -271,7 +299,9 @@
                           data-bs-toggle="modal"
                           data-bs-target="#shareExperienceModal"
                         >
-                          Edit
+                          {% if post_info.confirm == 1 %} Edit {% elif
+                          post_info.confirm == 2 %} Edit dan Kirim Ulang {%
+                          endif %}
                         </button>
                         <button
                           class="btn btn-md btn-djID2 btn-primary"
@@ -296,7 +326,7 @@
                     </div>
                     <div>
                       <ul>
-                        {% if user_info %}
+                        {% if user_info %} {% if post_info.confirm == 1 %}
                         <li class="d-flex align-items-center">
                           <span class="like-num"
                             >{{post_info.count_heart}}</span
@@ -320,7 +350,7 @@
                             ><i class="bi bi-chat-left-text-fill fs-4"></i
                           ></a>
                         </li>
-                        {% else %}
+                        {% endif %} {% else %}
                         <li class="d-flex align-items-center text-danger">
                           Login
                           <a href="/login" class="fw-bold text-danger"
@@ -338,6 +368,7 @@
                 <!-- End post content -->
               </article>
             </div>
+            {% if post_info.confirm == 1 %}
             <div class="col-6 col-md-4">
               <article class="blog-details ms-3">
                 <h4 class="like-comment">Komentar terkait postingan</h4>
@@ -457,6 +488,7 @@
                 </div>
               </article>
             </div>
+            {% endif %}
           </div>
         </div>
       </section>

@@ -4,9 +4,16 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
 
-    <title>DeJourney ID</title>
+    <title>DeJourney ID - Login</title>
     <meta content="" name="description" />
     <meta content="" name="keywords" />
+
+    <meta property="og:title" content="DeJourney ID" />
+    <meta property="og:description" content="Bagikan pengalaman wisatamu" />
+    <meta
+      property="og:image"
+      content="{{ url_for('static', filename='og_image.png') }}"
+    />
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -15,6 +22,8 @@
       href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600;1,700&family=Roboto:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Work+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap"
       rel="stylesheet"
     />
+
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
 
     <!-- Vendor CSS Files -->
     <link
@@ -43,6 +52,7 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
       $(document).ready(function () {
@@ -58,15 +68,15 @@
         <div
           class="container-fluid container-xl d-flex align-items-center justify-content-between"
         >
-        <a href="/" class="logo d-flex align-items-center">
-          <img
-            src="{{ url_for('static', filename='DJ_icon.png') }}"
-            alt="icon-DejourneyID"
-            height="40px"
-          />
-          <h1 style="color: greenyellow">DeJourney ID</h1>
-          <span style="color: aliceblue">.</span>
-        </a>
+          <a href="/" class="logo d-flex align-items-center">
+            <img
+              src="{{ url_for('static', filename='DJ_icon.png') }}"
+              alt="icon-DejourneyID"
+              height="40px"
+            />
+            <h1 style="color: greenyellow">DeJourney ID</h1>
+            <span style="color: aliceblue">.</span>
+          </a>
 
           <i class="mobile-nav-toggle mobile-nav-show bi bi-list"></i>
           <i class="mobile-nav-toggle mobile-nav-hide d-none bi bi-x"></i>

@@ -4,9 +4,16 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
 
-    <title>DeJourney ID</title>
+    <title>DeJourney ID - About Us</title>
     <meta content="" name="description" />
     <meta content="" name="keywords" />
+
+    <meta property="og:title" content="DeJourney ID" />
+    <meta property="og:description" content="Bagikan pengalaman wisatamu" />
+    <meta
+      property="og:image"
+      content="{{ url_for('static', filename='og_image.png') }}"
+    />
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -14,6 +21,12 @@
     <link
       href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600;1,700&family=Roboto:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Work+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap"
       rel="stylesheet"
+    />
+
+    <link
+      rel="shortcut icon"
+      href="{{ url_for('static', filename='favicon.ico') }}"
+      type="image/x-icon"
     />
 
     <!-- Vendor CSS Files -->
@@ -41,27 +54,12 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-      function postsaran() {
-        let username = $("#username").val();
-        let message = $("#message").val();
-        $.ajax({
-          type: "POST",
-          url: "/post_saran",
-          data: {
-            username_give: username,
-            message_give: message,
-          },
-          success: function (response) {
-            if (response["result"] === "success") {
-              alert(response["msg"]);
-              $("#username").val("");
-              $("#message").val("");
-            }
-          },
-        });
-      }
+      $(document).ready(function () {
+        $("#navabout").addClass("active");
+      });
     </script>
   </head>
 
@@ -162,7 +160,7 @@
               </div>
             </div>
 
-            <div class="col-lg-5" data-aos="fade">
+            <div class="col-lg-5" data-aos="fade" id="msgFormBox">
               <h3>Saran dan masukan</h3>
               <p>
                 Silahkan berikan pandangan, ide, atau pengalaman Anda untuk
@@ -177,7 +175,8 @@
                     placeholder="Name"
                     id="username"
                     required
-                    value="{% if user_login %}{{user_login.profile_name}}{% endif %}"
+                    value="{% if user_login %}{{user_login.profile_name}}{% elif request.args.get('user') %}{{request.args.get('user')}}
+                {% endif %}"
                   />
                 </div>
 
@@ -189,7 +188,10 @@
                     placeholder="Message"
                     id="message"
                     required
-                  ></textarea>
+                  >
+{% if request.args.get('request') %}Permintaan buka akun, (Mohon berikan keterangan kenapa akun anda harus dibuka, tunggu dalam waktu kurang dari 2 hari sejak pengiriman untuk memeriksa kembali akun anda apakah sudah bisa login atau masih dalam status diblokir)
+              {% endif %}</textarea
+                  >
                 </div>
 
                 <div class="col-md-12 text-center">
@@ -219,15 +221,10 @@
 
           <div class="slides-2 swiper">
             <div class="swiper-wrapper">
-              {% for data in datasaran %}
+              {% for data in datasaran %} {% if data.show == true %}
               <div class="swiper-slide">
                 <div class="testimonial-wrap">
                   <div class="testimonial-item">
-                    <img
-                      src="assets/img/testimonials/testimonials-1.jpg"
-                      class="testimonial-img"
-                      alt=""
-                    />
                     <h3>{{data.username}}</h3>
                     <p>
                       <i class="bi bi-quote quote-icon-left"></i>
@@ -237,94 +234,8 @@
                   </div>
                 </div>
               </div>
-              {% endfor %}
+              {% endif %} {% endfor %}
               <!-- End testimonial item -->
-
-              <div class="swiper-slide">
-                <div class="testimonial-wrap">
-                  <div class="testimonial-item">
-                    <img
-                      src="assets/img/testimonials/testimonials-2.jpg"
-                      class="testimonial-img"
-                      alt=""
-                    />
-                    <h3>Sara Wilsson</h3>
-                    <p>
-                      <i class="bi bi-quote quote-icon-left"></i>
-                      Export tempor illum tamen malis malis eram quae irure esse
-                      labore quem cillum quid cillum eram malis quorum velit
-                      fore eram velit sunt aliqua noster fugiat irure amet legam
-                      anim culpa.
-                      <i class="bi bi-quote quote-icon-right"></i>
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <!-- End testimonial item -->
-
-              <div class="swiper-slide">
-                <div class="testimonial-wrap">
-                  <div class="testimonial-item">
-                    <img
-                      src="assets/img/testimonials/testimonials-3.jpg"
-                      class="testimonial-img"
-                      alt=""
-                    />
-                    <h3>Jena Karlis</h3>
-                    <p>
-                      <i class="bi bi-quote quote-icon-left"></i>
-                      Enim nisi quem export duis labore cillum quae magna enim
-                      sint quorum nulla quem veniam duis minim tempor labore
-                      quem eram duis noster aute amet eram fore quis sint minim.
-                      <i class="bi bi-quote quote-icon-right"></i>
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <!-- End testimonial item -->
-
-              <div class="swiper-slide">
-                <div class="testimonial-wrap">
-                  <div class="testimonial-item">
-                    <img
-                      src="assets/img/testimonials/testimonials-4.jpg"
-                      class="testimonial-img"
-                      alt=""
-                    />
-                    <h3>Matt Brandon</h3>
-                    <p>
-                      <i class="bi bi-quote quote-icon-left"></i>
-                      Fugiat enim eram quae cillum dolore dolor amet nulla culpa
-                      multos export minim fugiat minim velit minim dolor enim
-                      duis veniam ipsum anim magna sunt elit fore quem dolore
-                      labore illum veniam.
-                      <i class="bi bi-quote quote-icon-right"></i>
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <!-- End testimonial item -->
-
-              <div class="swiper-slide">
-                <div class="testimonial-wrap">
-                  <div class="testimonial-item">
-                    <img
-                      src="assets/img/testimonials/testimonials-5.jpg"
-                      class="testimonial-img"
-                      alt=""
-                    />
-                    <h3>John Larson</h3>
-                    <p>
-                      <i class="bi bi-quote quote-icon-left"></i>
-                      Quis quorum aliqua sint quem legam fore sunt eram irure
-                      aliqua veniam tempor noster veniam enim culpa labore duis
-                      sunt culpa nulla illum cillum fugiat legam esse veniam
-                      culpa fore nisi cillum quid.
-                      <i class="bi bi-quote quote-icon-right"></i>
-                    </p>
-                  </div>
-                </div>
-              </div>
               <!-- End testimonial item -->
             </div>
             <div class="swiper-pagination"></div>
@@ -365,11 +276,6 @@
     <!-- Template Main JS File -->
     <script src="static/js/main.js"></script>
     <script src="static/js/navbar-control.js"></script>
-
-    <script>
-      $(document).ready(function () {
-        $("#navabout").addClass("active");
-      });
-    </script>
+    <script src="static/js/about-control.js"></script>
   </body>
 </html>

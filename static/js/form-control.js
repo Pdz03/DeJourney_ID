@@ -131,10 +131,46 @@ function login(){
       },
       success: function (response) {
         if (response["result"] == "success") {
+          if(!response.data['blocked']){
           $.cookie("mytoken", response["token"], { path: "/" });
-
-          alert("Anda berhasil login! Mulailah berbagi pengalaman perjalananmu!" + response.data['profilename']);
+          if(response.data['level'] === 2){
+            Swal.fire({
+              title: "Berhasil login",
+              text: "Anda berhasil login! Mulailah berbagi pengalaman perjalananmu! " + response.data['profilename'],
+              icon: "success"
+            });
           window.location.href = "/content";
+          }else if(response.data['level'] === 1){
+            Swal.fire({
+              title: "Berhasil login",
+              text: "Anda berhasil login!",
+              icon: "success"
+            });
+            window.location.href = "/dashboard";
+          }
+        } else {
+          Swal.fire({
+            title: "Gagal login",
+            showDenyButton: true,
+            showCancelButton: false,
+            confirmButtonText: "Kirim Permintaan",
+            denyButtonText: "Tutup",
+            html: `
+            <h4 class="text-danger">Akun anda telah terblokir!</h4>
+            <p>Alasan Pemblokiran: ${response.data['reasonblock']}<p>
+            <small class="text-danger">Hubungi admin untuk informasi lebih lanjut dengan mengirim permintaan melalui tombol di bawah</small>
+          `,
+            icon: "error"
+          }).then((result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
+              window.location.href = "/about?user="+response.data['userblock']+"&request=req#msgFormBox"
+            } else if (result.isDenied) {
+              Swal.DismissReason.cancel;
+            }
+          });;
+          resetform_login()
+        }
         } else {
           alert(response["msg"]);
         }
@@ -310,7 +346,11 @@ function register(){
           },
           success: function (response) {
             console.log(response.data);
-            alert("Akun anda telah terdaftar!");
+            Swal.fire({
+              title: "Berhasil register",
+              text: "Akun anda telah terdaftar! Silakan login",
+              icon: "success"
+            });
             window.location.replace("/login?email="+response.data);
           },
         });

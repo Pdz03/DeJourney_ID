@@ -1,14 +1,26 @@
-// const togglePassword = document.querySelector("#togglePassword");
-// const password = document.querySelector("#inputpassword");
+const togglePasswordOld = document.querySelector("#togglePasswordOld");
+const passwordOld = document.querySelector("#old-password");
 
-// togglePassword.addEventListener("click", function () {
-// // toggle the type attribute
-// const type = password.getAttribute("type") === "password" ? "text" : "password";
-// password.setAttribute("type", type);
+togglePasswordOld.addEventListener("click", function () {
+// toggle the type attribute
+const type = passwordOld.getAttribute("type") === "password" ? "text" : "password";
+passwordOld.setAttribute("type", type);
 
-// // toggle the icon
-// this.classList.toggle("bi-eye");
-// });
+// toggle the icon
+this.classList.toggle("bi-eye");
+});
+
+const togglePasswordNew = document.querySelector("#togglePasswordNew");
+const passwordNew = document.querySelector("#new-password");
+
+togglePasswordNew.addEventListener("click", function () {
+// toggle the type attribute
+const type = passwordNew.getAttribute("type") === "password" ? "text" : "password";
+passwordNew.setAttribute("type", type);
+
+// toggle the icon
+this.classList.toggle("bi-eye");
+});
 
 function is_password(asValue) {
     var regExp = /^(?=.*\d)(?=.*[a-zA-Z])[0-9a-zA-Z!@#$%^&*]{8,20}$/;
@@ -222,4 +234,47 @@ $.ajax({
     }
   },
 });      
+}
+
+function resetPass(username, password){
+  let passOldInput = $('#old-password');
+  let passNewInput = $('#new-password');
+
+  let passOld = passOldInput.val();
+  let passNew = passNewInput.val();
+
+  if (passOld !== password){
+    alert('Password lama tidak sesuai! Mohon periksa kembali!')
+    passOldInput.val("");
+    passOldInput.focus();
+  }else if(passNew === passOld){
+    alert('Mohon masukkan password yang berbeda dengan password lama anda!')
+    passNewInput.val("");
+    passNewInput.focus();
+  }else if(passNew === ''){
+    alert('Mohon masukkan password baru!')
+    passNewInput.val("");
+    passNewInput.focus();
+  }else if(!is_password(passNew)){
+    alert('Mohon sesuaikan format password seperti sebelumnya!')
+    passNewInput.val("");
+    passNewInput.focus();
+  }else{
+    $.ajax({
+      type: "POST",
+      url: "/reset_pass",
+      data: {
+        username_give: username,
+        passnew_give: passNew
+      },
+      success: function (response) {
+        if(response['result'] ==='success'){
+        alert("Password akun anda berhasil diupdate!");
+        window.location.reload();
+        }
+      },
+    });  
+  }
+
+  
 }
