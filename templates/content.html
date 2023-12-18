@@ -25,17 +25,40 @@
 
 
   <!-- Vendor CSS Files -->
-  <link href="static/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <link href="static/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="static/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
-  <link href="static/vendor/aos/aos.css" rel="stylesheet">
-  <link href="static/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
-  <link href="static/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+  <link
+  href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}"
+  rel="stylesheet"
+/>
+<link
+  href="{{ url_for('static', filename='vendor/bootstrap-icons/bootstrap-icons.css') }}"
+  rel="stylesheet"
+/>
+<link
+  href="{{ url_for('static', filename='vendor/fontawesome-free/css/all.min.css') }}"
+  rel="stylesheet"
+/>
+<link
+  href="{{ url_for('static', filename='vendor/aos/aos.css') }}"
+  rel="stylesheet"
+/>
+<link
+  href="{{ url_for('static', filename='vendor/glightbox/css/glightbox.min.css') }}"
+  rel="stylesheet"
+/>
+<link
+  href="{{ url_for('static', filename='vendor/swiper/swiper-bundle.min.css') }}"
+  rel="stylesheet"
+/>
 
   <!-- Template Main CSS File -->
-  <link href="static/css/main.css" rel="stylesheet">
-
-  <link href="static/css/style.css" rel="stylesheet" />
+  <link
+  href="{{ url_for('static', filename='css/main.css') }}"
+  rel="stylesheet"
+/>
+<link
+  href="{{ url_for('static', filename='css/style.css') }}"
+  rel="stylesheet"
+/>
   
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
@@ -97,7 +120,10 @@
   <main id="main">
 
     <!-- ======= Breadcrumbs ======= -->
-    <div class="breadcrumbs d-flex align-items-center" style="background-image: url('static/img/content-bg.jpg');">
+    <div
+    class="breadcrumbs d-flex align-items-center"
+    style="background-image: url('{{ url_for('static', filename='img/content-bg.jpg') }}');"
+  >
       <div class="container position-relative d-flex flex-column align-items-center" data-aos="fade">
 
         <h2>DeJourney Stories</h2>
@@ -180,17 +206,15 @@
   <div id="preloader"></div>
 
  <!-- Vendor JS Files -->
- <script src="static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
- <script src="static/vendor/aos/aos.js"></script>
- <script src="static/vendor/glightbox/js/glightbox.min.js"></script>
- <script src="static/vendor/isotope-layout/isotope.pkgd.min.js"></script>
- <script src="static/vendor/swiper/swiper-bundle.min.js"></script>
- <script src="static/vendor/purecounter/purecounter_vanilla.js"></script>
+ <script src="{{ url_for('static', filename='vendor/aos/aos.js') }}"></script>
+ <script src="{{ url_for('static', filename='vendor/glightbox/js/glightbox.min.js') }}"></script>
+ <script src="{{ url_for('static', filename='vendor/isotope-layout/isotope.pkgd.min.js') }}"></script>
+ <script src="{{ url_for('static', filename='vendor/swiper/swiper-bundle.min.js') }}"></script>
+ <script src="{{ url_for('static', filename='vendor/purecounter/purecounter_vanilla.js') }}"></script>
 
- <!-- Template Main JS File -->
- <script src="static/js/main.js"></script>
- <script src="static/js/navbar-control.js"></script>
- <script src="static/js/content-control.js"></script>
+ <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+ <script src="{{ url_for('static', filename='js/navbar-control.js') }}"></script>
+ <script src="{{ url_for('static', filename='js/content-control.js') }}"></script>
 
 
 

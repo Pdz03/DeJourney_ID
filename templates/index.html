@@ -24,16 +24,40 @@
   <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
 
   <!-- Vendor CSS Files -->
-  <link href="static/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <link href="static/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="static/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
-  <link href="static/vendor/aos/aos.css" rel="stylesheet">
-  <link href="static/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
-  <link href="static/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+  <link
+  href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}"
+  rel="stylesheet"
+/>
+<link
+  href="{{ url_for('static', filename='vendor/bootstrap-icons/bootstrap-icons.css') }}"
+  rel="stylesheet"
+/>
+<link
+  href="{{ url_for('static', filename='vendor/fontawesome-free/css/all.min.css') }}"
+  rel="stylesheet"
+/>
+<link
+  href="{{ url_for('static', filename='vendor/aos/aos.css') }}"
+  rel="stylesheet"
+/>
+<link
+  href="{{ url_for('static', filename='vendor/glightbox/css/glightbox.min.css') }}"
+  rel="stylesheet"
+/>
+<link
+  href="{{ url_for('static', filename='vendor/swiper/swiper-bundle.min.css') }}"
+  rel="stylesheet"
+/>
 
   <!-- Template Main CSS File -->
-  <link href="static/css/main.css" rel="stylesheet">
-  <link href="static/css/style.css" rel="stylesheet">
+  <link
+  href="{{ url_for('static', filename='css/main.css') }}"
+  rel="stylesheet"
+/>
+<link
+  href="{{ url_for('static', filename='css/style.css') }}"
+  rel="stylesheet"
+/>
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
@@ -98,12 +122,11 @@
     </div>
 
     <div id="hero-carousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
-
-      <div class="carousel-item active" style="background-image: url(static/img/background/gunung1.jpg)"></div>
-      <div class="carousel-item" style="background-image: url(static/img/background/pantai-ora.jpg)"></div>
-      <div class="carousel-item" style="background-image: url(static/img/background/danau-kelimutu.jpg)"></div>
-      <div class="carousel-item" style="background-image: url(static/img/background/pulau-padar.jpg)"></div>
-      <div class="carousel-item" style="background-image: url(static/img/background/raja-ampat.jpg)"></div>
+      <div class="carousel-item active" style="background-image: url('{{ url_for('static', filename='img/background/gunung1.jpg') }}')"></div>
+      <div class="carousel-item" style="background-image: url('{{ url_for('static', filename='img/background/pantai-ora.jpg') }}')"></div>
+      <div class="carousel-item" style="background-image: url('{{ url_for('static', filename='img/background/danau-kelimutu.jpg') }}')"></div>
+      <div class="carousel-item" style="background-image: url('{{ url_for('static', filename='img/background/pulau-padar.jpg') }}')"></div>
+      <div class="carousel-item" style="background-image: url('{{ url_for('static', filename='img/background/raja-ampat.jpg') }}')"></div>
 
       <a class="carousel-control-prev" href="#hero-carousel" role="button" data-bs-slide="prev">
         <span class="carousel-control-prev-icon bi bi-chevron-left" aria-hidden="true"></span>
@@ -219,18 +242,15 @@
 
   <!-- Vendor JS Files -->
  
-  <script src="static/vendor/aos/aos.js"></script>
-  <script src="static/vendor/glightbox/js/glightbox.min.js"></script>
-  <script src="static/vendor/isotope-layout/isotope.pkgd.min.js"></script>
-  <script src="static/vendor/swiper/swiper-bundle.min.js"></script>
-  <script src="static/vendor/purecounter/purecounter_vanilla.js"></script>
+  <script src="{{ url_for('static', filename='vendor/aos/aos.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/glightbox/js/glightbox.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/isotope-layout/isotope.pkgd.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/swiper/swiper-bundle.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/purecounter/purecounter_vanilla.js') }}"></script>
 
-  <!-- Template Main JS File -->
-  <script src="static/js/main.js"></script>
-  <script src="static/js/navbar-control.js"></script>
-  <script src="static/js/home-control.js"></script>
-
-
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/navbar-control.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/home-control.js') }}"></script>
 
 </body>
 

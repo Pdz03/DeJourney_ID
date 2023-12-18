@@ -2,10 +2,8 @@ from flask import Flask, render_template, jsonify, request, redirect, url_for
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 from datetime import datetime, timedelta
-import locale
 import jwt
 from werkzeug.utils import secure_filename
-
 
 app = Flask(__name__)
 app.config["TEMPLATES_AUTO_RELOAD"] = True
@@ -18,7 +16,6 @@ client = MongoClient(MONGODB_CONNECTION_STRING)
 db = client.dbjourney
 
 TOKEN_KEY = "mytoken"
-
 
 @app.route('/')
 def home():
@@ -97,9 +94,7 @@ def page_login():
         )
         user_info = db.user.find_one({'username': payload.get('id')})
 
-        print(user_info)
-
-        return redirect(url_for("home", msg="Anda sudah login!"))
+        return redirect(url_for("home", msg=f"Anda sudah login sebagai {user_info['username']}!"))
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return render_template('login.html')
 
@@ -238,8 +233,6 @@ def update_like():
             "type": type_receive,
         }
 
-        print(action_receive)
-
         if action_receive == "like":
             db.likes.insert_one(doc)
             doc_notif = {
@@ -327,33 +320,6 @@ def deletecomment(idcomment):
     return jsonify({"result": "success", "msg": "Komentar berhasil dihapus!"})
 
 
-@app.route("/update_reply/<commentid>", methods=["POST"])
-def update_reply(commentid):
-    token_receive = request.cookies.get("mytoken")
-    try:
-        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=["HS256"])
-        # We should change the like count for the post here
-        user_info = db.user.find_one({"username": payload["id"]})
-        commentid_receive = request.form["commentid_give"]
-        reply_receive = request.form["reply_give"]
-        date_receive = request.form["date_give"]
-        doc = {
-            "commentid": commentid_receive,
-            "username": user_info["username"],
-            "reply": reply_receive,
-            "date": date_receive,
-        }
-
-        db.comments.insert_one(doc)
-        count = db.comments.count_documents(
-            {"postid": post_id_receive}
-        )
-
-        return jsonify({"result": "success", "msg": "updated", "count": count})
-    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
-        return redirect(url_for("home"))
-
-
 @app.route("/update_story", methods=["POST"])
 def update_post():
     token_receive = request.cookies.get("mytoken")
@@ -420,7 +386,7 @@ def detail_content(idpost):
         {"postid": idpost},
         {"_id": False}
     )
-    print(post_info)
+    
     if post_info != None:
         post_info["count_heart"] = db.likes.count_documents(
             {"postid": idpost, "type": "heart"})
@@ -504,7 +470,7 @@ def user(username):
     try:
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=["HS256"])
         user_login = db.user.find_one({"username": payload["id"]})
-        print(user_login)
+        
         if user_info['username'] == user_login['username']:
             return render_template("user-profile.html", user_info=user_info, user_login=user_login)
         else:
@@ -603,8 +569,6 @@ def confirm_post():
             reason_receive = request.form["reason_give"]
             doc['isi'] = f'{username} telah menolak permintaan postinganmu yang berjudul "{judulpost}", dengan alasan "{reason_receive}"'
 
-        print(doc)
-
         db.notif.insert_one(doc)
 
         db.posts.update_one({"postid": id_receive}, {
@@ -622,7 +586,7 @@ def confirm_msg():
         id_receive = request.form["id_give"]
         type_receive = request.form["type_give"]
         data = db.saran.find_one({'_id': ObjectId(id_receive)})
-        print(data)
+
         if type_receive == 'show':
             db.saran.update_one({"_id": ObjectId(id_receive)}, {
                             "$set": {'show': True}})
@@ -652,7 +616,6 @@ def blockuser():
         db.blocklist.insert_one(doc)
         db.user.update_one({"username": username_receive}, {"$set": {'blocked':True}})
 
-        print(doc)
         return jsonify({"result": "success", "msg": "User blocked!"})
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("home"))
@@ -684,7 +647,7 @@ def content():
 def media():
     kategori = list(db.categories.find({}))
     media = list(db.media.find({}))
-    print(media)
+
     token_receive = request.cookies.get("mytoken")
     try:
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=["HS256"])
@@ -720,7 +683,6 @@ def add_media():
             doc["image"] = file_path
         if type_receive == 'baru':
             db.categories.insert_one({'kategori':kategori_receive})
-        print(doc)
         db.media.insert_one(doc)
         return jsonify({"result": "success", "msg": "Post updated!"})
     except(jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
@@ -731,7 +693,6 @@ def add_media():
 def about():
     token_receive = request.cookies.get("mytoken")
     data = list(db.saran.find({}))
-    print(data)
     try:
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=["HS256"])
         user_login = db.user.find_one({"username": payload["id"]})
@@ -812,8 +773,6 @@ def getnotif():
                 'profile_pic_real':datauser['profile_pic_real']
             }
         
-        print(notif)
-        
         return jsonify({"result": "success", "msg":"berhasil", "notif": notif})
     except(jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return jsonify({"result": "fail", "msg":"gagal"})
@@ -825,12 +784,7 @@ def notifikasi():
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=["HS256"])
         count_unread = db.notif.count_documents(
             {'to':payload['id'], 'read': False})
-    # posts = list(db.posts.find({}))
-    # for post in posts:
-    #     post["_id"] = str(post["_id"])
-    #     db.posts.update_one({"postid": post['postid']}, {"$set": {'confirm': 0}})
-    
-    # db.notif.delete_many({},{})
+
         return render_template('notifikasi.html', unread=count_unread)
     except(jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("home"))
